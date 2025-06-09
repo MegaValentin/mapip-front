@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/NavBar.jsx";
+import IpPage from "./pages/IpPage.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ProtectedRoutes from "./ProtectedRoutes.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
@@ -24,7 +25,8 @@ function App() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route element={<ProtectedRoutes />}>
                     <Route path="/" element={<HomePage />} />
-                    {/* Otras rutas protegidas */}
+                    <Route path="/ips" element={<IpPage/> } />
+                    
                   </Route>
                 </Routes>
               </main>

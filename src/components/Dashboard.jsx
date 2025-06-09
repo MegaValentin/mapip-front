@@ -1,23 +1,26 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+
 export default function Dashboard() {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) return null;
 
   return (
-    <div className="bg-dark text-white p-3" style={{ minWidth: "250px" }}>
-      <h4 className="mb-4">Panel</h4>
+    <div className=" dashboard" style={{ minWidth: "250px" }}>
+      <Link to="/" >
+      <img src="../../public/logoMapIp.png" alt="Logo" className="dashboard-logo" style={{ maxWidth: "200px" }} />
+      </Link>
       <ul className="nav flex-column">
         <li className="nav-item">
-          <Link to="/" className="nav-link text-white">
+          <Link to="/" className="nav-link ">
             Inicio
           </Link>
         </li>
         <li className="nav-item">
-          <Link to="/otra-ruta" className="nav-link text-white">
-            Otra sección
+          <Link to="/ips" className="nav-link ">
+            IPS
           </Link>
         </li>
       </ul>

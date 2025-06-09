@@ -1,4 +1,4 @@
-import Navbar from "../components/NavBar";
+import ListIps from "../components/ListIps";
 
 export default function HomePage() {
   return (
@@ -6,7 +6,7 @@ export default function HomePage() {
      
       <div className="">
         <h2>Bienvenido al panel de control</h2>
-        {/* Podés seguir agregando contenido acá */}
+        <ListIps/>          
       </div>
     </>
   );

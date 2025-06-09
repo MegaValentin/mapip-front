@@ -9,11 +9,9 @@ function Navbar() {
   if(!isAuthenticated) return null
 
   return (
-    <nav className="--bs-info-bg-subtle navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className=" navbar navbar-expand-lg  ">
       <div className="container">
-        <Link className="navbar-brand" to="/">
-          MAP IP
-        </Link>
+        
 
         
         <div className="collapse navbar-collapse" id="navbarNav">
@@ -22,7 +20,7 @@ function Navbar() {
               <>
                 
                 <li className="nav-item">
-                  <button className="nav-link active" onClick={logout}>
+                  <button className="nav-link boton" onClick={logout}>
                     <IconLogout/>
                   </button>
                 </li>
