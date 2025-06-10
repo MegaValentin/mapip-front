@@ -5,7 +5,7 @@ export default function HomePage() {
     <>
      
       <div className="">
-        <h2>Bienvenido al panel de control</h2>
+        
         <ListIps/>          
       </div>
     </>
