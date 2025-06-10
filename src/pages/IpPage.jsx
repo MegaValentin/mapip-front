@@ -1,4 +1,4 @@
-
+import ListGateways from "../components/ListGateways";
 
 export default function IpPage() {
   return (
@@ -6,7 +6,7 @@ export default function IpPage() {
      
       <div className="">
         <h2>Pagina de IPS</h2>
-        {/* Podés seguir agregando contenido acá */}
+        <ListGateways/>
       </div>
     </>
   );

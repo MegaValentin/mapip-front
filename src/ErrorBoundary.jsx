@@ -16,7 +16,18 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      return <h1>Algo salio mal</h1>;
+      return (
+        <div className="alert alert-danger text-center m-5 p-4 rounded">
+          <h1>¡Uy! Algo salió mal.</h1>
+          <p>Estamos trabajando para solucionarlo. Por favor, intenta recargar la página.</p>
+          <button 
+            className="btn btn-danger mt-3"
+            onClick={() => window.location.reload()}
+          >
+            Recargar página
+          </button>
+        </div>
+      );
     }
 
     return this.props.children;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function ListIps() {
+export default function ListIps({ puertaEnlace, onClose }) {
   const [ips, setIps] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -13,7 +14,8 @@ export default function ListIps() {
     const fetchIps = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${apiUrl}/api/ips/filtradas?page=${page}&limit=15`, {
+        const res = await axios.get(`${apiUrl}/api/ips/filtradas`, {
+          params: { puertaEnlace, page, limit },
           withCredentials: true,
         });
 
@@ -27,20 +29,22 @@ export default function ListIps() {
     };
 
     fetchIps();
-  }, [page]); // <-- se actualiza cuando cambia la página
+  }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
 
   return (
-    <div className="container mt-4">
-      <h3>Listado de Ips</h3>
-
+    <div className="ips-list-container mt-3 p-3 border">
+      <h4>IPs para puerta de enlace: {puertaEnlace}</h4>
+      <button onClick={onClose} className="btn btn-secondary mb-2">
+        Cerrar
+      </button>
       {loading ? (
         <div className="text-center">
           <div className="spinner-border text-primary" role="status" />
         </div>
-      ) : (
-        <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-dark">
+      ) : ips.length > 0 ? (
+        <>
+          <table className="table table-striped">
+            <thead>
               <tr>
                 <th>Direccion Ip</th>
                 <th>Estado</th>
@@ -52,11 +56,10 @@ export default function ListIps() {
               </tr>
             </thead>
             <tbody>
-              {ips.length > 0 ? (
-                ips.map((ip) => (
-                  <tr key={ip._id}>
-                    <td>{ip.direccion}</td>
-                    <td>
+              {ips.map((ip) => (
+                <tr key={ip._id}>
+                  <td>{ip.direccion}</td>
+                  <td>
                       <span
                         className={`badge ${
                           ip.estado === "ocupada"
@@ -74,40 +77,43 @@ export default function ListIps() {
                     <td>{ip.area || "Sin área"}</td>
                     <td>{new Date(ip.updatedAt).toLocaleString()}</td>
                     <td>botones</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center">
-                    No hay IPs registradas
-                  </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
-        </div>
+
+          {/* Paginación simple */}
+          <nav>
+            <ul className="pagination justify-content-center">
+              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Anterior
+                </button>
+              </li>
+              <li className="page-item disabled">
+                <span className="page-link">
+                  Página {page} de {totalPages}
+                </span>
+              </li>
+              <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                >
+                  Siguiente
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </>
+      ) : (
+        <p>No hay IPs registradas para esta puerta de enlace.</p>
       )}
-
-      {/* Paginado */}
-      <div className="d-flex justify-content-center gap-2 mt-4">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
-          className="btn btn-secondary"
-        >
-          Anterior
-        </button>
-
-        <span className="align-self-center">{page} </span>
-
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage((prev) => prev + 1)}
-          className="btn btn-secondary"
-        >
-          Siguiente
-        </button>
-      </div>
     </div>
   );
 }
