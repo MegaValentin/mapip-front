@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import ListIps from "./ListIps";
+import SeeIcon from "./icons/SeeIcon";
+
 
 export default function ListGateways() {
     const [gateways, setGateways] = useState([])
@@ -54,10 +56,10 @@ export default function ListGateways() {
                                             <td>{gateway}</td>
                                             <td>
                                                 <button
-                                                    className="btn btn-primary btn-sm"
+                                                    className="btn buttonSee"
                                                     onClick={() => setSelectedGateway(gateway)}
                                                 >
-                                                    Ver IPs
+                                                    <SeeIcon/>
                                                 </button>
                                             </td>
 

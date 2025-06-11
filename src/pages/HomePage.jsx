@@ -1,4 +1,4 @@
-import ListIps from "../components/ListIps";
+
 
 export default function HomePage() {
   return (
@@ -6,7 +6,7 @@ export default function HomePage() {
      
       <div className="">
         
-        <ListIps/>          
+          
       </div>
     </>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import CloseIcon from "./icons/CloseIcon";
 
 export default function ListIps({ puertaEnlace, onClose }) {
   const [ips, setIps] = useState([]);
@@ -19,8 +20,8 @@ export default function ListIps({ puertaEnlace, onClose }) {
           withCredentials: true,
         });
 
-        setIps(res.data.data);               
-        setTotalPages(res.data.totalPages);  
+        setIps(res.data.data);
+        setTotalPages(res.data.totalPages);
       } catch (error) {
         console.error("Error al obtener las IPs", error);
       } finally {
@@ -31,11 +32,27 @@ export default function ListIps({ puertaEnlace, onClose }) {
     fetchIps();
   }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
 
+  const handleDelete = async (ipId) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar esta IP?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${apiUrl}/api/ips/${ipId}`, {
+        withCredentials: true,
+      });
+      // Actualizar lista después de eliminar
+      setIps((prevIps) => prevIps.filter((ip) => ip._id !== ipId));
+    } catch (error) {
+      console.error("Error al eliminar la IP:", error);
+      alert("Ocurrió un error al intentar eliminar la IP.");
+    }
+  };
+
   return (
     <div className="ips-list-container mt-3 p-3 border">
       <h4>IPs para puerta de enlace: {puertaEnlace}</h4>
-      <button onClick={onClose} className="btn btn-secondary mb-2">
-        Cerrar
+      <button onClick={onClose} className="btn buttonClose">
+        <CloseIcon />
       </button>
       {loading ? (
         <div className="text-center">
@@ -51,8 +68,8 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 <th>Hostname</th>
                 <th>MAC</th>
                 <th>Area</th>
+                <th></th>
                 <th>Ultima modificacion</th>
-                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -60,23 +77,27 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 <tr key={ip._id}>
                   <td>{ip.direccion}</td>
                   <td>
-                      <span
-                        className={`badge ${
-                          ip.estado === "ocupada"
-                            ? "bg-success"
-                            : ip.estado === "libre"
+                    <span
+                      className={`badge ${ip.estado === "ocupada"
+                          ? "bg-success"
+                          : ip.estado === "libre"
                             ? "color-estado-libre"
                             : "bg-warning text-dark"
                         }`}
-                      >
-                        {ip.estado}
-                      </span>
-                    </td>
-                    <td>{ip.hostname || "Sin hostname"}</td>
-                    <td>{ip.mac || "MAC no asignada"}</td>
-                    <td>{ip.area || "Sin área"}</td>
-                    <td>{new Date(ip.updatedAt).toLocaleString()}</td>
-                    <td>botones</td>
+                    >
+                      {ip.estado}
+                    </span>
+                  </td>
+                  <td>{ip.hostname || "Sin hostname"}</td>
+                  <td>{ip.mac || "MAC no asignada"}</td>
+                  <td>{ip.area || "Sin área"}</td>
+                  <td className="d-flex gap-2">
+
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(ip._id)}>
+                      Eliminar
+                    </button>
+                  </td>
+                  <td>{new Date(ip.updatedAt).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

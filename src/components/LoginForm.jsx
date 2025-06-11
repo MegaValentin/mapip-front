@@ -22,11 +22,11 @@ export default function LoginForm() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="container d-flex justify-content-center align-items-center mb-4">
-      <div className="card shadow w-100" style={{ maxWidth: "400px" }}>
+    <div className="container d-flex justify-content-center align-items-center mb-4 ">
+      <div className="card shadow w-100 fondoCard" style={{ maxWidth: "400px" }}>
         <div className="card-body">
-          <h2 className="card-title text-center mb-4">Iniciar Sesión</h2>
-
+        <img src="../../public/logoMapIp.png" alt="Logo" className="dashboard-logo" style={{ maxWidth: "300px" }} />
+          
           {signinErrors && signinErrors.length > 0 && (
             <div className="alert alert-danger">
               {signinErrors.map((err, i) => (
@@ -39,7 +39,7 @@ export default function LoginForm() {
 
           <form onSubmit={onSubmit}>
             <div className="mb-3">
-              <label className="form-label">Legajo</label>
+              
               <input
                 type="number"
                 {...register("legajo", { required: true, valueAsNumber: true })}
@@ -54,7 +54,6 @@ export default function LoginForm() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Contraseña</label>
               <input
                 type="password"
                 {...register("password", { required: true })}

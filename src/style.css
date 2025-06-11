@@ -1,3 +1,9 @@
+.fondo{
+  background: #0a2a49;
+}
+.fondoCard{
+  background: #12304e;
+}
 .dashboard {
     background-color: #0a2a49; 
     color: white;
@@ -32,7 +38,9 @@
     color: white;
     background-color: #12304e; 
   }
-
+  .form-label{
+    color:white
+  }
   .navbar{
     background-color: #0a2a49; 
   }
@@ -41,10 +49,31 @@
     color: white;
   }
 
-  .boton:hover{
+  .boton:hover .buttonSee:hover{
     color: #6b6b6b
   }
 
   .color-estado-libre{
     background: rgb(28, 85, 28);
+  }
+
+  .buttonClose{
+    color: red
+  }
+
+  .buttonSee{
+    color:blue;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
   }

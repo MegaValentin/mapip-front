@@ -21,9 +21,9 @@ export default function RegisterForm() {
 
   return (
     <div className="container d-flex justify-content-center align-items-center mb-4">
-      <div className="card shadow w-100" style={{ maxWidth: "400px" }}>
+      <div className="card shadow w-100 fondoCard" style={{ maxWidth: "400px" }}>
         <div className="card-body">
-          <h2 className="card-title text-center mb-4">Registrarse</h2>
+        <img src="../../public/logoMapIp.png" alt="Logo" className="dashboard-logo" style={{ maxWidth: "300px" }} />
 
           {signupErrors && signupErrors.length > 0 && (
             <div className="alert alert-danger">
@@ -37,7 +37,7 @@ export default function RegisterForm() {
 
           <form onSubmit={onSubmit}>
             <div className="mb-3">
-              <label className="form-label">Nombre de usuario</label>
+              <label className="form-label ">Nombre de usuario</label>
               <input
                 type="text"
                 {...register("username", { required: true })}

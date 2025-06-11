@@ -11,6 +11,7 @@ import ErrorBoundary from "./ErrorBoundary.jsx";
 
 
 function App() {
+  
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -21,6 +22,7 @@ function App() {
               
               <Dashboard />
               <main className="flex-grow-1 p-4 overflow-auto bg-light w-100">
+                
                 <Routes>
                   <Route path="/login" element={<LoginPage />} />
                   <Route element={<ProtectedRoutes />}>
