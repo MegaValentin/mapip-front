@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import IconLogout from "./icons/LogoutIcon";
 
 export default function Dashboard() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated) return null;
 
@@ -23,6 +23,11 @@ export default function Dashboard() {
             IPS
           </Link>
         </li>
+        <li className="nav-item">
+                  <button className="nav-link " onClick={logout}>
+                    <IconLogout/>
+                  </button>
+                </li>
       </ul>
     </div>
   );

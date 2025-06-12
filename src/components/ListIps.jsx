@@ -49,18 +49,18 @@ export default function ListIps({ puertaEnlace, onClose }) {
   };
 
   return (
-    <div className="ips-list-container mt-3 p-3 border">
-      <h4>IPs para puerta de enlace: {puertaEnlace}</h4>
-      <button onClick={onClose} className="btn buttonClose">
+    <div className="modal-content position-relative p-4 bg-white rounded shadow">
+      <button onClick={onClose} className="btn buttonClose position-absolute start-0 top-0 m-2 ">
         <CloseIcon />
       </button>
+      
       {loading ? (
         <div className="text-center">
           <div className="spinner-border text-primary" role="status" />
         </div>
       ) : ips.length > 0 ? (
         <>
-          <table className="table table-striped">
+          <table className="table table-striped mt-4">
             <thead>
               <tr>
                 <th>Direccion Ip</th>

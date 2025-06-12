@@ -1,30 +1,54 @@
+import { useEffect, useState } from "react";
 import ListGateways from "../components/ListGateways";
 import AddGatewayModal from "../components/AddGatewayModal";
-import { useState } from "react";
+import axios from "axios";
 
 export default function IpPage() {
-  const [ showModal, setShowModal ] = useState(false)
-  const [ reload, setReload ] = useState(false)
+    const [gateways, setGateways] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
-  return (
-    <div className="">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Puertas de Enlace</h3>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-          Agregar Puerta de Enlace
-        </button>
-      </div>
+    const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
-      <ListGateways reload={reload} />
+    const fetchGateways = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${apiUrl}/api/gateways`, {
+                withCredentials: true
+            });
+            setGateways(res.data.gateways);
+        } catch (err) {
+            console.error("Error al obtener gateways", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      {showModal && (
-        <AddGatewayModal
-          onClose={() => setShowModal(false)}
-          onAdded={() => {
-            setReload(reload); // fuerza recarga de la lista
-          }}
-        />
-      )}
-    </div>
-  );
+    useEffect(() => {
+        fetchGateways();
+    }, []);
+
+    return (
+        <div className="p-4">
+            <button
+                className="btn btn-primary mb-3"
+                onClick={() => setShowModal(true)}
+            >
+                Agregar puerta de enlace
+            </button>
+
+            <ListGateways
+                gateways={gateways}
+                loading={loading}
+                onRefresh={fetchGateways}
+            />
+
+            {showModal && (
+                <AddGatewayModal
+                    onClose={() => setShowModal(false)}
+                    onAdded={fetchGateways} // 🔄 Actualiza la lista
+                />
+            )}
+        </div>
+    );
 }

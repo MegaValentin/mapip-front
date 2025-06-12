@@ -1,52 +1,44 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useState } from "react";
+import SeeIcon from "../components/icons/SeeIcon"
 import ListIps from "./ListIps";
-import SeeIcon from "./icons/SeeIcon";
 
+export default function ListGateways({ gateways, loading, onRefresh }) {
+    const [selectedGateway, setSelectedGateway] = useState(null);
 
-export default function ListGateways() {
-    const [gateways, setGateways] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [selectedGateway, setSelectedGateway] = useState(null)
+    const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
-
-    const apiUrl = import.meta.env.VITE_REACT_APP_API_URL
-
-    useEffect(() => {
-        const fetchGateways = async () => {
-            setLoading(true)
-            try {
-                const res = await axios.get(`${apiUrl}/api/gateways`, {
-                    withCredentials: true
-                })
-
-                setGateways(res.data.gateways)
-            } catch (error) {
-                console.error("Error al obtener las Puertas de enlaces", error)
-            } finally {
-                setLoading(false)
-            }
+    const handleDeleteGateway = async (puertaEnlace) => {
+        if (!confirm(`¿Seguro que querés eliminar todas las IPs con puerta de enlace ${puertaEnlace}?`)) return;
+      
+        try {
+          await axios.delete(`${apiUrl}/api/removegateways`, {
+            data: { puertaEnlace },
+            withCredentials: true,
+          });
+          onRefresh(); // Actualiza la lista
+        } catch (error) {
+          console.error("Error al eliminar la puerta de enlace:", error);
+          alert("No se pudo eliminar la puerta de enlace");
         }
+      };
 
-        fetchGateways()
-    }, [])
 
     return (
         <div className="container mt-4">
-            <h3>Rangos de IP</h3>
+
             {loading ? (
                 <div className="text-center">
                     <div className="spinner-border text-primary" role="status" />
                 </div>
             ) : (
                 <>
-
                     <div className="table-responsive">
                         <table className="table table-bordered table-hover">
                             <thead className="table-dark">
                                 <tr>
-                                    <th> Puerta enlace</th>
-                                    <th> Accion </th>
+                                    <th>Puerta de enlace</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -55,19 +47,26 @@ export default function ListGateways() {
                                         <tr key={gateway}>
                                             <td>{gateway}</td>
                                             <td>
-                                                <button
-                                                    className="btn buttonSee"
-                                                    onClick={() => setSelectedGateway(gateway)}
-                                                >
-                                                    <SeeIcon/>
-                                                </button>
+                                                <div className="d-flex gap-2">
+                                                    <button
+                                                        className="btn buttonSee"
+                                                        onClick={() => setSelectedGateway(gateway)}
+                                                    >
+                                                        <SeeIcon />
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger"
+                                                        onClick={() => handleDeleteGateway(gateway)}
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
                                             </td>
-
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center">
+                                        <td colSpan="2" className="text-center">
                                             No hay IPs registradas
                                         </td>
                                     </tr>
@@ -82,12 +81,8 @@ export default function ListGateways() {
                             onClose={() => setSelectedGateway(null)}
                         />
                     )}
-
-
                 </>
-            )
-            }
+            )}
         </div>
-    )
-
+    );
 }

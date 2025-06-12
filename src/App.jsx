@@ -3,7 +3,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import Dashboard from "./components/Dashboard.jsx";
-import Navbar from "./components/NavBar.jsx";
+
 import IpPage from "./pages/IpPage.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import ProtectedRoutes from "./ProtectedRoutes.jsx";
@@ -16,7 +16,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <ErrorBoundary>
-              <Navbar/>
+              
           <div className="d-flex vh-100">
             <div className="d-flex flex-grow-1">
               
