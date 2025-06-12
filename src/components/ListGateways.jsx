@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import SeeIcon from "../components/icons/SeeIcon"
 import ListIps from "./ListIps";
+import TrashIcon from "./icons/TrashIcon";
 
 export default function ListGateways({ gateways, loading, onRefresh }) {
     const [selectedGateway, setSelectedGateway] = useState(null);
@@ -38,7 +39,7 @@ export default function ListGateways({ gateways, loading, onRefresh }) {
                             <thead className="table-dark">
                                 <tr>
                                     <th>Puerta de enlace</th>
-                                    <th>Acción</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,16 +50,16 @@ export default function ListGateways({ gateways, loading, onRefresh }) {
                                             <td>
                                                 <div className="d-flex gap-2">
                                                     <button
-                                                        className="btn buttonSee"
+                                                        className="btn btn-sm btn-outline-primary"
                                                         onClick={() => setSelectedGateway(gateway)}
                                                     >
                                                         <SeeIcon />
                                                     </button>
                                                     <button
-                                                        className="btn btn-danger"
+                                                        className="btn btn-sm btn-outline-danger"
                                                         onClick={() => handleDeleteGateway(gateway)}
                                                     >
-                                                        Eliminar
+                                                        <TrashIcon/>
                                                     </button>
                                                 </div>
                                             </td>

@@ -31,7 +31,7 @@ export default function IpPage() {
     return (
         <div className="p-4">
             <button
-                className="btn btn-primary mb-3"
+                className="btn btn-sm btn-outline-primary"
                 onClick={() => setShowModal(true)}
             >
                 Agregar puerta de enlace
