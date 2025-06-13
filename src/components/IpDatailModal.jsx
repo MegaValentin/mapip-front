@@ -6,7 +6,7 @@ export default function IpDatailsModal({ ip, onClose }) {
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content p-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5 className="modal-title">Detalle de IP</h5>
+                        <h5 className="modal-title">DETALLE DE IP</h5>
                         <button className="btn btn-sm btn-outline-danger" onClick={onClose}>
                             <CloseIcon />
                         </button>
@@ -19,6 +19,7 @@ export default function IpDatailsModal({ ip, onClose }) {
                         <li className="list-group-item"><strong>Hostname:</strong> {ip.hostname || "Sin hostname"}</li>
                         <li className="list-group-item"><strong>MAC:</strong> {ip.mac || "Sin MAC"}</li>
                         <li className="list-group-item"><strong>Área:</strong> {ip.area || "Sin área"}</li>
+                        <li className="list-group-item"><strong>Equipo:</strong> {ip.area || "Sin data"}</li>
                         <li className="list-group-item"><strong>Observaciones:</strong> {ip.observaciones || "Sin Observacion"}</li>
                         
                         <li className="list-group-item"><strong>Última modificación:</strong> {new Date(ip.updatedAt).toLocaleString()}</li>

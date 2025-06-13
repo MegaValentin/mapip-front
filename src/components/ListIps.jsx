@@ -5,6 +5,12 @@ import TrashIcon from "./icons/TrashIcon";
 import SeeIcon from "./icons/SeeIcon";
 import EditIcon from "./icons/EditIcon";
 import IpDatailsModal from "./IpDatailModal";
+import IpEditModal from "./IpEditModal";
+import RouterIcon from "./icons/RouterIcon";
+import PrinterIcon from "./icons/PrinterIcon";
+import CpuIcon from "./icons/CpuIcon";
+import ServerIcon from "./icons/ServerIcon";
+import QuestionIcon from "./icons/QuestionIcon";
 
 export default function ListIps({ puertaEnlace, onClose }) {
   const [ips, setIps] = useState([]);
@@ -13,6 +19,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedIpData, setSelectedIpData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false)
+  const [ipToEdit, setIpToEdit] = useState(null);
   const limit = 10;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -92,6 +99,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 <th>Area</th>
                 <th></th>
                 <th>Ultima modificacion</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -113,12 +121,21 @@ export default function ListIps({ puertaEnlace, onClose }) {
                   <td>{ip.hostname || "Sin hostname"}</td>
                   <td>{ip.mac || "MAC no asignada"}</td>
                   <td>{ip.area || "Sin área"}</td>
+                  <td> {ip.equipo === "computadora" ? <CpuIcon />
+                    : ip.equipo === "impresora" ? <PrinterIcon />
+                      : ip.equipo === "router" ? <RouterIcon />
+                        : ip.equipo === "servidor" ? <ServerIcon />
+                          : <QuestionIcon />}</td>
+
                   <td className="d-flex gap-2">
 
                     <button className="btn btn-sm btn-outline-primary" onClick={() => handleViewIp(ip._id)}>
                       <SeeIcon />
                     </button>
-                    <button className="btn btn-sm btn-outline-warning">
+                    <button
+                      className="btn btn-sm btn-outline-warning"
+                      onClick={() => setIpToEdit(ip)}
+                    >
                       <EditIcon />
                     </button>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(ip._id)}>
@@ -127,10 +144,12 @@ export default function ListIps({ puertaEnlace, onClose }) {
 
                   </td>
                   <td>{new Date(ip.updatedAt).toLocaleString()}</td>
+
                 </tr>
               ))}
             </tbody>
           </table>
+
           {selectedIpData && !modalLoading && (
             <IpDatailsModal ip={selectedIpData} onClose={() => setSelectedIpData(null)} />
           )}
@@ -144,6 +163,17 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 </div>
               </div>
             </div>
+          )}
+
+          {ipToEdit && (
+            <IpEditModal
+              ip={ipToEdit}
+              onClose={() => setIpToEdit(null)}
+              onUpdated={() => {
+                setIpToEdit(null);
+                //setPage(1);  recargar la lista si querés
+              }}
+            />
           )}
 
           {/* Paginación simple */}
