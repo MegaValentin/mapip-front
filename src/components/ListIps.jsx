@@ -12,7 +12,7 @@ import CpuIcon from "./icons/CpuIcon";
 import ServerIcon from "./icons/ServerIcon";
 import QuestionIcon from "./icons/QuestionIcon";
 
-export default function ListIps({ puertaEnlace, onClose }) {
+export default function ListIps({ puertaEnlace, onClose, }) {
   const [ips, setIps] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -24,24 +24,26 @@ export default function ListIps({ puertaEnlace, onClose }) {
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
+  const fetchIps = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${apiUrl}/api/ips/filtradas`, {
+        params: { puertaEnlace, page, limit },
+        withCredentials: true,
+      });
+
+      setIps(res.data.data);
+      setTotalPages(res.data.totalPages);
+      
+    } catch (error) {
+      console.error("Error al obtener las IPs", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchIps = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${apiUrl}/api/ips/filtradas`, {
-          params: { puertaEnlace, page, limit },
-          withCredentials: true,
-        });
-
-        setIps(res.data.data);
-        setTotalPages(res.data.totalPages);
-      } catch (error) {
-        console.error("Error al obtener las IPs", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    
     fetchIps();
   }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
 
@@ -97,7 +99,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 <th>Hostname</th>
                 <th>MAC</th>
                 <th>Area</th>
-                <th></th>
+                <th>Equipo</th>
                 <th>Ultima modificacion</th>
                 <th></th>
               </tr>
@@ -109,9 +111,9 @@ export default function ListIps({ puertaEnlace, onClose }) {
                   <td>
                     <span
                       className={`badge ${ip.estado === "ocupada"
-                        ? "bg-success"
+                        ? "bg-primary"
                         : ip.estado === "libre"
-                          ? "color-estado-libre"
+                          ? "bg-success"
                           : "bg-warning text-dark"
                         }`}
                     >
@@ -127,6 +129,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
                         : ip.equipo === "servidor" ? <ServerIcon />
                           : <QuestionIcon />}</td>
 
+                  <td>{new Date(ip.updatedAt).toLocaleString()}</td>
                   <td className="d-flex gap-2">
 
                     <button className="btn btn-sm btn-outline-primary" onClick={() => handleViewIp(ip._id)}>
@@ -135,6 +138,9 @@ export default function ListIps({ puertaEnlace, onClose }) {
                     <button
                       className="btn btn-sm btn-outline-warning"
                       onClick={() => setIpToEdit(ip)}
+                      onUpdated={() => {setIpToEdit(null)
+                        fetchIps()}
+                      }
                     >
                       <EditIcon />
                     </button>
@@ -143,7 +149,6 @@ export default function ListIps({ puertaEnlace, onClose }) {
                     </button>
 
                   </td>
-                  <td>{new Date(ip.updatedAt).toLocaleString()}</td>
 
                 </tr>
               ))}
@@ -171,7 +176,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
               onClose={() => setIpToEdit(null)}
               onUpdated={() => {
                 setIpToEdit(null);
-                //setPage(1);  recargar la lista si querés
+                setPage(1);  //recargar la lista si querés
               }}
             />
           )}

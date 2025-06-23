@@ -5,9 +5,9 @@ export default function IpDatailsModal({ ip, onClose }) {
         <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-dialog-centered" role="document">
                 <div className="modal-content p-4">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
                         <h5 className="modal-title">DETALLE DE IP</h5>
-                        <button className="btn btn-sm btn-outline-danger" onClick={onClose}>
+                        <button className="btn btn-sm btn-outline-danger " onClick={onClose}>
                             <CloseIcon />
                         </button>
                     </div>

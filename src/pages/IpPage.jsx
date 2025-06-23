@@ -27,7 +27,7 @@ export default function IpPage() {
     useEffect(() => {
         fetchGateways();
     }, []);
-
+      
     return (
         <div className="p-4">
             <button

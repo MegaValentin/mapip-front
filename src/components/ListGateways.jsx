@@ -6,7 +6,6 @@ import TrashIcon from "./icons/TrashIcon";
 
 export default function ListGateways({ gateways, loading, onRefresh }) {
     const [selectedGateway, setSelectedGateway] = useState(null);
-
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
     const handleDeleteGateway = async (puertaEnlace) => {
@@ -79,7 +78,7 @@ export default function ListGateways({ gateways, loading, onRefresh }) {
                     {selectedGateway && (
                         <ListIps
                             puertaEnlace={selectedGateway}
-                            onClose={() => setSelectedGateway(null)}
+                            onClose={() => setSelectedGateway(null)}                          
                         />
                     )}
                 </>
