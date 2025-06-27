@@ -20,6 +20,9 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const [selectedIpData, setSelectedIpData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false)
   const [ipToEdit, setIpToEdit] = useState(null);
+  const [ ipsFree, setIpsFree ] = useState([])
+  const [ busyIps, setBuysIps ] = useState([])
+  const [ ipsWithConflicts, setIpsWithConflicts ] = useState([])
   const limit = 10;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -33,6 +36,8 @@ export default function ListIps({ puertaEnlace, onClose, }) {
       });
 
       setIps(res.data.data);
+
+    
       setTotalPages(res.data.totalPages);
       
     } catch (error) {
@@ -42,9 +47,48 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   };
 
+  const fetchFreeIps = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/lengthips`, {
+        params: { puertaEnlace,
+          estado: "libre", },
+        withCredentials: true
+      })
+      setIpsFree(res.data)
+    } catch (error) {
+      console.error("Error al obtener IPs libres", error)
+    }
+  } 
+  const fetchbusyIps = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/lengthips`, {
+        params: { puertaEnlace,
+          estado: "ocupada", },
+        withCredentials: true
+      })
+      setBuysIps(res.data)
+    } catch (error) {
+      console.error("Error al obtener IPs libres", error)
+    }
+  }
+  const fetchIpsWithConflicts = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/lengthips`, {
+        params: { puertaEnlace,
+          estado: "conflicto", },
+        withCredentials: true
+      })
+      setIpsWithConflicts(res.data)
+    } catch (error) {
+      console.error("Error al obtener IPs libres", error)
+    }
+  }
   useEffect(() => {
     
     fetchIps();
+    fetchFreeIps()
+    fetchbusyIps(),
+    fetchIpsWithConflicts()
   }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
 
   const handleDelete = async (ipId) => {
@@ -79,6 +123,8 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   }
 
+
+
   return (
     <div className="modal-content position-relative p-4 bg-white rounded shadow">
       <button onClick={onClose} className="btn btn-sm btn-outline-danger position-absolute start-0 top-0 mx-4 mt-2">
@@ -91,6 +137,15 @@ export default function ListIps({ puertaEnlace, onClose, }) {
         </div>
       ) : ips.length > 0 ? (
         <>
+        <div className="alert alert-success mt-3">
+  <strong>Total de IPs libres en {puertaEnlace}:</strong> {ipsFree.length}
+</div>
+<div className="alert alert-primary mt-3">
+  <strong>Total de IPs ocupadas en {puertaEnlace}:</strong> {busyIps.length}
+</div>
+<div className="alert alert-warning mt-3">
+  <strong>Ips con conflicto {puertaEnlace}:</strong> {ipsWithConflicts.length}
+</div>
           <table className="table table-striped mt-4">
             <thead>
               <tr>
