@@ -261,7 +261,12 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               onClose={() => setIpToEdit(null)}
               onUpdated={() => {
                 setIpToEdit(null);
-                setPage(1);  //recargar la lista si querés
+                fetchIps();
+                fetchFreeIps();
+                fetchbusyIps();
+                fetchIpsWithConflicts();
+
+
               }}
             />
           )}
