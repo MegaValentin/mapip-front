@@ -20,9 +20,9 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const [selectedIpData, setSelectedIpData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false)
   const [ipToEdit, setIpToEdit] = useState(null);
-  const [ ipsFree, setIpsFree ] = useState([])
-  const [ busyIps, setBuysIps ] = useState([])
-  const [ ipsWithConflicts, setIpsWithConflicts ] = useState([])
+  const [ipsFree, setIpsFree] = useState([])
+  const [busyIps, setBuysIps] = useState([])
+  const [ipsWithConflicts, setIpsWithConflicts] = useState([])
   const limit = 10;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -37,9 +37,9 @@ export default function ListIps({ puertaEnlace, onClose, }) {
 
       setIps(res.data.data);
 
-    
+
       setTotalPages(res.data.totalPages);
-      
+
     } catch (error) {
       console.error("Error al obtener las IPs", error);
     } finally {
@@ -50,20 +50,24 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const fetchFreeIps = async () => {
     try {
       const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: { puertaEnlace,
-          estado: "libre", },
+        params: {
+          puertaEnlace,
+          estado: "libre",
+        },
         withCredentials: true
       })
       setIpsFree(res.data)
     } catch (error) {
       console.error("Error al obtener IPs libres", error)
     }
-  } 
+  }
   const fetchbusyIps = async () => {
     try {
       const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: { puertaEnlace,
-          estado: "ocupada", },
+        params: {
+          puertaEnlace,
+          estado: "ocupada",
+        },
         withCredentials: true
       })
       setBuysIps(res.data)
@@ -74,8 +78,10 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const fetchIpsWithConflicts = async () => {
     try {
       const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: { puertaEnlace,
-          estado: "conflicto", },
+        params: {
+          puertaEnlace,
+          estado: "conflicto",
+        },
         withCredentials: true
       })
       setIpsWithConflicts(res.data)
@@ -84,11 +90,11 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   }
   useEffect(() => {
-    
+
     fetchIps();
     fetchFreeIps()
     fetchbusyIps(),
-    fetchIpsWithConflicts()
+      fetchIpsWithConflicts()
   }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
 
   const handleDelete = async (ipId) => {
@@ -137,15 +143,37 @@ export default function ListIps({ puertaEnlace, onClose, }) {
         </div>
       ) : ips.length > 0 ? (
         <>
-        <div className="alert alert-success mt-3">
-  <strong>Total de IPs libres en {puertaEnlace}:</strong> {ipsFree.length}
-</div>
-<div className="alert alert-primary mt-3">
-  <strong>Total de IPs ocupadas en {puertaEnlace}:</strong> {busyIps.length}
-</div>
-<div className="alert alert-warning mt-3">
-  <strong>Ips con conflicto {puertaEnlace}:</strong> {ipsWithConflicts.length}
-</div>
+          <div className="row mt-4">
+            <div className="col-md-4">
+              <div className="card border-success shadow text-center">
+                <div className="card-body">
+                  <h5 className="card-title text-success">IPs libres</h5>
+                  <p className="card-text fs-4">{ipsFree.length}</p>
+                  <small className="text-muted">en {puertaEnlace}</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card border-primary shadow text-center">
+                <div className="card-body">
+                  <h5 className="card-title text-primary">IPs ocupadas</h5>
+                  <p className="card-text fs-4">{busyIps.length}</p>
+                  <small className="text-muted">en {puertaEnlace}</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card border-warning shadow text-center">
+                <div className="card-body">
+                  <h5 className="card-title text-warning">IPs con conflicto</h5>
+                  <p className="card-text fs-4">{ipsWithConflicts.length}</p>
+                  <small className="text-muted">en {puertaEnlace}</small>
+                </div>
+              </div>
+            </div>
+          </div>
           <table className="table table-striped mt-4">
             <thead>
               <tr>
@@ -193,8 +221,10 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                     <button
                       className="btn btn-sm btn-outline-warning"
                       onClick={() => setIpToEdit(ip)}
-                      onUpdated={() => {setIpToEdit(null)
-                        fetchIps()}
+                      onUpdated={() => {
+                        setIpToEdit(null)
+                        fetchIps()
+                      }
                       }
                     >
                       <EditIcon />
