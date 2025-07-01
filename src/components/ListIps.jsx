@@ -11,6 +11,7 @@ import PrinterIcon from "./icons/PrinterIcon";
 import CpuIcon from "./icons/CpuIcon";
 import ServerIcon from "./icons/ServerIcon";
 import QuestionIcon from "./icons/QuestionIcon";
+import { CheckCircle, AlertTriangle, Cpu } from "lucide-react";
 
 export default function ListIps({ puertaEnlace, onClose, }) {
   const [ips, setIps] = useState([]);
@@ -144,35 +145,42 @@ export default function ListIps({ puertaEnlace, onClose, }) {
       ) : ips.length > 0 ? (
         <>
           <div className="row mt-4">
-            <div className="col-md-4">
-              <div className="card border-success shadow text-center">
-                <div className="card-body">
-                  <h5 className="card-title text-success">IPs libres</h5>
-                  <p className="card-text fs-4">{ipsFree.length}</p>
-                  <small className="text-muted">en {puertaEnlace}</small>
-                </div>
-              </div>
-            </div>
 
-            <div className="col-md-4">
-              <div className="card border-primary shadow text-center">
-                <div className="card-body">
-                  <h5 className="card-title text-primary">IPs ocupadas</h5>
-                  <p className="card-text fs-4">{busyIps.length}</p>
-                  <small className="text-muted">en {puertaEnlace}</small>
+            {[
+              {
+                title: "Ips Libre",
+                count: ipsFree.length,
+                border: "success",
+                text: "success",
+                icon: <CheckCircle className="text-success mb-2" size={24} />
+              },
+              {
+                title: "Ips Ocupadas",
+                count: busyIps.length,
+                border: "primary",
+                text: "primary",
+                icon: <Cpu className="text-primary mb-2" size={24} />,
+              },
+              {
+                title: "Ips con Conflicto",
+                count: ipsWithConflicts.length,
+                border: "warning",
+                text: "warning",
+                icon: <AlertTriangle className="text-warning mb-2" size={24} />,
+              }
+            ].map((info, index) => (
+              <div className="col-md-4" key={index}>
+                <div className={`card border-${info.border} shadow text-center`}>
+                  <div className="card-body">
+                    {info.icon}
+                    <h5 className={`card-title text-${info.text}`}>{info.title}</h5>
+                    <p className="card-text fs-4">{info.count}</p>
+                    <small className="text-muted">en {puertaEnlace}</small>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
 
-            <div className="col-md-4">
-              <div className="card border-warning shadow text-center">
-                <div className="card-body">
-                  <h5 className="card-title text-warning">IPs con conflicto</h5>
-                  <p className="card-text fs-4">{ipsWithConflicts.length}</p>
-                  <small className="text-muted">en {puertaEnlace}</small>
-                </div>
-              </div>
-            </div>
           </div>
           <table className="table table-striped mt-4">
             <thead>
@@ -265,8 +273,6 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                 fetchFreeIps();
                 fetchbusyIps();
                 fetchIpsWithConflicts();
-
-
               }}
             />
           )}
