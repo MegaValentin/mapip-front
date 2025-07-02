@@ -1,5 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import SeeIcon from "./icons/SeeIcon";
+import TrashIcon from "./icons/TrashIcon";
+
 
 export default function ListOffices() {
     const [offices, setOffices] = useState([])
@@ -14,7 +17,7 @@ export default function ListOffices() {
         setLoading(true)
         try {
             const res = await axios.get(`${apiUrl}/api/offices/paginated`, {
-                params: {  page, limit },
+                params: { page, limit },
                 withCredentials: true
             })
 
@@ -29,7 +32,7 @@ export default function ListOffices() {
     }
     useEffect(() => {
         fetchOffices()
-    }, [ page, apiUrl])
+    }, [page, apiUrl])
     return (
         <div className="modal-content position-relative p-4 bg-white rounded shadow">
             {loading ? (
@@ -38,6 +41,7 @@ export default function ListOffices() {
                 </div>
             ) : offices.length > 0 ? (
                 <>
+                
                     <table className="table table-striped mt-4">
                         <thead>
                             <tr>
@@ -50,7 +54,14 @@ export default function ListOffices() {
                             {offices.map((office) => (
                                 <tr key={office._id}>
                                     <td>{office.area}</td>
-                                    <td></td>
+                                    <td className="d-flex gap-2">
+                                        <button className="btn btn-sm btn-outline-primary">
+                                            <SeeIcon />
+                                        </button>
+                                        <button className="btn btn-sm btn-outline-danger" >
+                                            <TrashIcon />
+                                        </button>
+                                    </td>
                                 </tr>
 
                             ))}

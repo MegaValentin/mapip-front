@@ -3,30 +3,34 @@ import axios from "axios";
 
 import AddOfficesExcel from "../components/AddOfficesExcel"
 import ListOffices from "../components/ListOffices";
+import AddIcon from "../components/icons/AddIcon";
+import AddOffices from "../components/AddOffices";
 
 export default function OfficesPages(){
     const [ loading, setLoading] = useState(true)
     const [ offices, setOffices ] = useState([])
+    const [ showModal, setShowModal ] = useState(false)
 
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
-    useEffect(() => {
-        const fetchOffices = async () => {
-            try {
-                const res = await axios.get(`${apiUrl}/api/offices`, {
-                    withCredentials: true
-                })
+    const fetchOffices = async () => {
+        try {
+            const res = await axios.get(`${apiUrl}/api/offices`, {
+                withCredentials: true
+            })
 
-                setOffices(res.data)
-            } catch (error) {
-                console.error("Error al obtener las areas: ", error)
-            } finally{
-                setLoading(false)
-            }
+            setOffices(res.data)
+        } catch (error) {
+            console.error("Error al obtener las areas: ", error)
+        } finally{
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
 
         fetchOffices()
-    }, [ apiUrl ])
+    }, [])
 
     const handleOfficeAdded = (newOffice) => {
         setOffices((prevOffice) => [...prevOffice, newOffice]);
@@ -42,12 +46,27 @@ export default function OfficesPages(){
     }
 
     return (
-        
+
         <div className="container mt-4">
           {offices.length === 0 ? (
             <AddOfficesExcel onOfficeAdded={handleOfficeAdded} />
           ) : (
+            <>
+            <div className="mb-3">
+                <button 
+                className="btn btn-sm btn-outline-success"
+                onClick={() => setShowModal(true)}>
+                    <AddIcon/>
+                </button>
+            </div>
             <ListOffices />
+
+            {showModal && (
+                <AddOffices
+                    onClose={() => setShowModal(false)}
+                    onAdded={fetchOffices}  />              
+            )}
+            </>
           )}
         </div>
     )
