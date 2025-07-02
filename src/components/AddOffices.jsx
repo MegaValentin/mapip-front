@@ -13,7 +13,7 @@ export default function AddOffices({onClose, onAdded}){
         setLoading(true)
         try {
             await axios.post(`${apiUrl}/api/addoffice`,{
-                offices},
+                area: offices},
                 {withCredentials: true}
             )
             onAdded()
@@ -41,7 +41,7 @@ export default function AddOffices({onClose, onAdded}){
                         <button type="button" className="btn btn-secondary me-2" onClick={onClose}>
                             Cancelar
                         </button>
-                        <button type="button" className="btn btn-primary" disabled={loading}>
+                        <button type="submit" className="btn btn-primary" disabled={loading}>
                             {loading ? "Guardando" : "Agregar"}
                         </button>
                     </div>

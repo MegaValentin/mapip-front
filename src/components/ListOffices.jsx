@@ -33,6 +33,24 @@ export default function ListOffices() {
     useEffect(() => {
         fetchOffices()
     }, [page, apiUrl])
+
+    const handleDeleteOffice = async (officeId) => {
+        const confirmDelete = window.confirm("¿Estas seguro de que queres eliminar esta area?")
+
+        if(!confirmDelete) return
+
+        try {
+            await axios.delete(`${apiUrl}/api/office/${officeId}`,
+            {
+                withCredentials: true
+            })
+
+            setOffices((prevOffice) => prevOffice.filter((office) => office._id !== officeId))
+        } catch (error) {
+            console.error("Error al eliminar el Area: ", error)
+            alert("Ocurrio un error al intentar eliminar el area.")
+        }
+    }
     return (
         <div className="modal-content position-relative p-4 bg-white rounded shadow">
             {loading ? (
@@ -58,7 +76,9 @@ export default function ListOffices() {
                                         <button className="btn btn-sm btn-outline-primary">
                                             <SeeIcon />
                                         </button>
-                                        <button className="btn btn-sm btn-outline-danger" >
+                                        <button 
+                                        className="btn btn-sm btn-outline-danger"
+                                        onClick={() => handleDeleteOffice(office._id)} >
                                             <TrashIcon />
                                         </button>
                                     </td>
