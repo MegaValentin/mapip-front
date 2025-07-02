@@ -1,5 +1,7 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 
+import UserManagementPage from "./pages/UserManagementPage.jsx";
+import OfficesPages from "./pages/OfficesPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import Dashboard from "./components/Dashboard.jsx";
@@ -28,7 +30,8 @@ function App() {
                   <Route element={<ProtectedRoutes />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/ips" element={<IpPage/> } />
-                    
+                    <Route path="/offices" element={<OfficesPages/>}/>
+                    <Route path="/user-management" element={<UserManagementPage/>}/>
                   </Route>
                 </Routes>
               </main>

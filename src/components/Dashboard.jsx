@@ -24,6 +24,16 @@ export default function Dashboard() {
           </Link>
         </li>
         <li className="nav-item">
+            <Link to="/offices" className="nav-link">
+              Gestion de Areas
+            </Link>
+        </li>
+        <li className="nav-items">
+          <Link to="/user-management" className="nav-link">
+              Gestion de Usuarios          
+          </Link>
+        </li>
+        <li className="nav-item">
                   <button className="nav-link " onClick={logout}>
                     <IconLogout/>
                   </button>
