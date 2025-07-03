@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import CloseIcon from "./icons/CloseIcon";
+import { useEffect } from "react";
 
 
 export default function IpEditModal({ ip, onClose, onUpdated }) {
@@ -14,6 +15,7 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
         equipo: ip.equipo || ""
     })
     const [errors, setErrors] = useState([])
+    const [offices, setOffices] = useState([])
 
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -46,6 +48,21 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
         }
     }
 
+    useEffect(() => {
+        const fetchOffices = async () => {
+            try {
+                const res = await axios.get(`${apiUrl}/api/offices`, {
+                    withCredentials: true
+                })
+                setOffices(res.data)
+            } catch (error) {
+                console.error("Error al cargar el area", error)
+            }
+        }
+
+        fetchOffices()
+    }, [apiUrl])
+
     return (
         <div className="modal fade show d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -53,7 +70,7 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
                     <button className="btn btn-sm btn-outline-danger position-absolute end-0 top-0 m-3" onClick={onClose}>
                         <CloseIcon />
                     </button>
-                    
+
                     <form onSubmit={handleSubmit} className="row g-3 mt-3">
                         <div className="col-md-6">
                             <label className="form-label text-black">Dirección IP</label>
@@ -96,12 +113,20 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
 
                         <div className="col-md-6">
                             <label className="form-label text-black">Área</label>
-                            <input type="text"
-                                className="form-control"
+                            <select
+                                className="form-select"
                                 name="area"
-                                placeholder="Area"
                                 value={formData.area}
-                                onChange={handleChange} />
+                                onChange={handleChange}
+                            >
+                                <option value="">Seleccionar área</option>
+                                {offices.map((a) => (
+                                    <option key={a._id} value={a._id}>
+                                        {a.area}
+                                    </option>
+                                ))}
+                            </select>
+
                         </div>
                         <div className="col-md-6">
                             <label className="form-label text-black">Equipo</label>

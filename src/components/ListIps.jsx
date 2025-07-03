@@ -213,7 +213,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                   </td>
                   <td>{ip.hostname || "Sin hostname"}</td>
                   <td>{ip.mac || "MAC no asignada"}</td>
-                  <td>{ip.area || "Sin área"}</td>
+                  <td>{ip.area?.area || "Sin área"}</td>
                   <td> {ip.equipo === "computadora" ? <CpuIcon />
                     : ip.equipo === "impresora" ? <PrinterIcon />
                       : ip.equipo === "router" ? <RouterIcon />
