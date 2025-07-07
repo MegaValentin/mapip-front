@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import SeeIcon from "./icons/SeeIcon";
 import TrashIcon from "./icons/TrashIcon";
+import ScanIcon from "./icons/ScanIcon";
 import OfficeModal from "./OfficeModal";
+import IpsOfficeModal from "./IpsOfficeModal";
 
 export default function ListOffices() {
     const [offices, setOffices] = useState([]);
@@ -12,6 +14,8 @@ export default function ListOffices() {
     const [selectedOffice, setSelectedOffice] = useState(null);
     const [selectedOfficeIps, setSelectedOfficeIps] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [scanning, setScanning] = useState(false)
+    const [scanResults, setScanResults] = useState(null)
     const limit = 10;
 
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -60,6 +64,27 @@ export default function ListOffices() {
         }
     };
 
+    const handleScanIps = async (office) => {
+        setScanning(true)
+        setSelectedOffice(office)
+        setScanResults(null)
+        setShowModal(true)
+
+        try {
+            const res = await axios.get(`${apiUrl}/api/scan/office/${office._id}`, {
+                withCredentials: true
+            })
+
+            setScanResults(res.data.results)
+
+        } catch (error) {
+            console.error("Error al escanear IPs: ", error)
+            alert("Error al escanear las Ips de la oficina")
+        } finally {
+            setScanning(false)
+        }
+    }
+
     useEffect(() => {
         fetchOffices();
     }, [page]);
@@ -91,6 +116,12 @@ export default function ListOffices() {
                                                 onClick={() => handleViewIps(office)}
                                             >
                                                 <SeeIcon />
+                                            </button>
+                                            <button
+                                                className="btn btn-sm btn-outline-secondary"
+                                                onClick={() => handleScanIps(office)}
+                                            >
+                                                <ScanIcon/>
                                             </button>
                                             <button
                                                 className="btn btn-sm btn-outline-danger"
@@ -135,12 +166,25 @@ export default function ListOffices() {
             </div>
 
             {showModal && selectedOffice && selectedOfficeIps && (
-        <OfficeModal
-          office={selectedOffice}
-          data={selectedOfficeIps}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+                <OfficeModal
+                    office={selectedOffice}
+                    data={selectedOfficeIps}
+                    onClose={() => setShowModal(false)}
+                />
+            )}
+            
+            {showModal && selectedOffice && (
+                <IpsOfficeModal 
+                office={selectedOffice}
+                data={selectedOfficeIps}
+                onClose={() => {
+                    setShowModal(false)
+                    setScanResults(null)
+                }}
+                scanResults={scanResults}
+                scanning={scanning}
+                />
+            )}
         </>
     );
 }

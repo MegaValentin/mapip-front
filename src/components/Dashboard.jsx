@@ -14,8 +14,8 @@ export default function Dashboard() {
       </Link>
       <ul className="nav flex-column">
         <li className="nav-item">
-          <Link to="/" className="nav-link ">
-            Inicio
+          <Link to="/scan" className="nav-link ">
+            Scaneo de Ips
           </Link>
         </li>
         <li className="nav-item">
