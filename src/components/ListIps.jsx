@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+
+import IpDatailsModal from "./IpDatailModal";
+import IpEditModal from "./IpEditModal";
+import IpScanModal from "./IpScanModal";
+
 import CloseIcon from "./icons/CloseIcon";
 import TrashIcon from "./icons/TrashIcon";
 import SeeIcon from "./icons/SeeIcon";
 import EditIcon from "./icons/EditIcon";
-import IpDatailsModal from "./IpDatailModal";
-import IpEditModal from "./IpEditModal";
 import RouterIcon from "./icons/RouterIcon";
 import PrinterIcon from "./icons/PrinterIcon";
 import CpuIcon from "./icons/CpuIcon";
 import ServerIcon from "./icons/ServerIcon";
 import QuestionIcon from "./icons/QuestionIcon";
+import ScanIcon from "./icons/ScanIcon";
+
 import { CheckCircle, AlertTriangle, Cpu } from "lucide-react";
 
 export default function ListIps({ puertaEnlace, onClose, }) {
@@ -24,6 +29,9 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const [ipsFree, setIpsFree] = useState([])
   const [busyIps, setBuysIps] = useState([])
   const [ipsWithConflicts, setIpsWithConflicts] = useState([])
+  const [scanResults, setScanResults] = useState(null)
+  const [scanning, setScanning] = useState(false)
+
   const limit = 10;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
@@ -130,6 +138,27 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   }
 
+  const handleScanIp = async (ipId) => {
+    setScanning(true)
+    try {
+      const res = await axios.get(`${apiUrl}/api/scan/ips/${ipId}`, {
+        withCredentials: true
+      })
+
+      setScanResults(res.data)
+      console.log(res.data)
+    } catch (error) {
+      console.error("Error al escanear la ip: ", error)
+      setScanResults({
+        message: "Error al escanear",
+        direccion: "desconocidad",
+        activa: false,
+        resultado: error.message
+      })
+    } finally {
+      setScanning(false)
+    }
+  }
 
 
   return (
@@ -237,6 +266,12 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                     >
                       <EditIcon />
                     </button>
+                    <button
+                      className="btn btn-sm btn-outline-info"
+                      onClick={() => handleScanIp(ip._id)}
+                    >
+                      <ScanIcon/>
+                    </button>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(ip._id)}>
                       <TrashIcon />
                     </button>
@@ -276,6 +311,12 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               }}
             />
           )}
+
+<IpScanModal
+  result={scanResults}
+  loading={scanning}
+  onClose={() => setScanResults(null)}
+/>
 
           {/* Paginación simple */}
           <nav>
