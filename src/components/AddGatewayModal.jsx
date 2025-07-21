@@ -36,7 +36,7 @@ export default function AddGatewayModal({ onClose, onAdded }) {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content p-4 bg-white rounded shadow">
+            <div className="modal-content p-4 bg-white rounded shadow w-50">
                 <h5>Agregar puerta de enlace</h5>
 
                 <form onSubmit={handleSubmit}>

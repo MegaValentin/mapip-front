@@ -318,7 +318,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                           : <QuestionIcon />}</td>
 
                   <td>{new Date(ip.updatedAt).toLocaleString()}</td>
-                  <td className="d-flex gap-2">
+                  <td className="justify-content-end d-flex gap-2">
 
                     <button className="btn btn-sm btn-outline-primary" onClick={() => handleViewIp(ip._id)}>
                       <SeeIcon />

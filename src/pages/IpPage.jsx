@@ -29,7 +29,7 @@ export default function IpPage() {
     }, []);
       
     return (
-        <div className="p-4">
+        <div className="p-4 container">
             <button
                 className="btn btn-sm btn-outline-primary"
                 onClick={() => setShowModal(true)}

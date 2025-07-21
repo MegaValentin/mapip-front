@@ -25,7 +25,7 @@ export default function ListGateways({ gateways, loading, onRefresh }) {
 
 
     return (
-        <div className="container mt-4">
+        <div className="mt-4">
 
             {loading ? (
                 <div className="text-center">
@@ -47,7 +47,7 @@ export default function ListGateways({ gateways, loading, onRefresh }) {
                                         <tr key={gateway}>
                                             <td>{gateway}</td>
                                             <td>
-                                                <div className="d-flex gap-2">
+                                                <div className="justify-content-end d-flex gap-2">
                                                     <button
                                                         className="btn btn-sm btn-outline-primary"
                                                         onClick={() => setSelectedGateway(gateway)}
