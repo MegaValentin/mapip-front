@@ -14,6 +14,7 @@ import PrinterIcon from "./icons/PrinterIcon";
 import CpuIcon from "./icons/CpuIcon";
 import ServerIcon from "./icons/ServerIcon";
 import QuestionIcon from "./icons/QuestionIcon";
+import ScanMacIcon from "./icons/ScanMacIcon";
 import ScanIcon from "./icons/ScanIcon";
 
 import { CheckCircle, AlertTriangle, Cpu } from "lucide-react";
@@ -31,8 +32,9 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const [ipsWithConflicts, setIpsWithConflicts] = useState([])
   const [scanResults, setScanResults] = useState(null)
   const [scanning, setScanning] = useState(false)
+  const [feedback, setFeedback] = useState(null);
 
-  const limit = 10;
+  const limit = 20;
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
@@ -98,6 +100,34 @@ export default function ListIps({ puertaEnlace, onClose, }) {
       console.error("Error al obtener IPs libres", error)
     }
   }
+
+  const compareMac = async (ipId) => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/compare/${ipId}`, {
+        withCredentials: true
+      })
+
+      const message = res.data?.mensaje
+
+      const itIsConflict = message.toLowerCase().includes("conflictiva")
+      const isBusy = message.toLowerCase().includes("MAC asignada automáticamente desde escaneo.")
+      const noHost = message.toLowerCase().includes("Host no activo")
+
+      setFeedback({
+        mensaje: message,
+        tipo: itIsConflict ? "conflicto" : isBusy ? "ocupada" : noHost ? "libre" : "info"
+      })
+
+      fetchIps()
+
+    } catch (error) {
+      setFeedback({
+        mensaje: "Error al escanear IP",
+        tipo: "error"
+      });
+    }
+  }
+
   useEffect(() => {
 
     fetchIps();
@@ -160,6 +190,15 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   }
 
+  useEffect(() => {
+    if (feedback) {
+      const timer = setTimeout(() => {
+        setFeedback(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
+
 
   return (
     <div className="modal-content position-relative p-4 bg-white rounded shadow">
@@ -211,6 +250,35 @@ export default function ListIps({ puertaEnlace, onClose, }) {
             ))}
 
           </div>
+          <nav className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                  aria-label="Anterior"
+                >
+                  <span aria-hidden="true">&laquo;</span>
+                </button>
+              </li>
+              <li className="page-item disabled">
+                <span className="page-link">
+                  Página {page} de {totalPages}
+                </span>
+              </li>
+              <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                <button
+                  className="page-link"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                  aria-label="Siguiente"
+                >
+                  <span aria-hidden="true">&raquo;</span>
+                </button>
+              </li>
+            </ul>
+          </nav>
           <table className="table table-striped mt-4">
             <thead>
               <tr>
@@ -270,7 +338,13 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                       className="btn btn-sm btn-outline-info"
                       onClick={() => handleScanIp(ip._id)}
                     >
-                      <ScanIcon/>
+                      <ScanIcon />
+                    </button>
+                    <button
+                      onClick={() => compareMac(ip._id)}
+                      className="btn btn-sm btn-outline-info"
+                    >
+                      <ScanMacIcon />
                     </button>
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(ip._id)}>
                       <TrashIcon />
@@ -312,14 +386,29 @@ export default function ListIps({ puertaEnlace, onClose, }) {
             />
           )}
 
-<IpScanModal
-  result={scanResults}
-  loading={scanning}
-  onClose={() => setScanResults(null)}
-/>
+          <IpScanModal
+            result={scanResults}
+            loading={scanning}
+            onClose={() => setScanResults(null)}
+          />
 
-          {/* Paginación simple */}
-          <nav>
+          {feedback && (
+            <div
+              className={`alert mt-3 ${feedback.tipo === "conflicto"
+                ? "alert-warning"
+                : feedback.tipo === "ocupada"
+                  ? "alert-success"
+                  : feedback.tipo === "error"
+                    ? "alert-danger"
+                    : "alert-secondary"
+                }`}
+              role="alert"
+            >
+              {feedback.mensaje}
+            </div>
+          )}
+
+          <nav className="mt-3">
             <ul className="pagination justify-content-center">
               <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
                 <button
@@ -348,6 +437,8 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               </li>
             </ul>
           </nav>
+
+
 
         </>
       ) : (
