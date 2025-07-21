@@ -110,7 +110,7 @@ export default function ListOffices() {
                                 {offices.map((office) => (
                                     <tr key={office._id}>
                                         <td>{office.area}</td>
-                                        <td className="d-flex gap-2">
+                                        <td className="justify-content-end d-flex gap-2">
                                             <button
                                                 className="btn btn-sm btn-outline-primary"
                                                 onClick={() => handleViewIps(office)}

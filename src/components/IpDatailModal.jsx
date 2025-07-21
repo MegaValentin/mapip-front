@@ -1,6 +1,12 @@
 import CloseIcon from "./icons/CloseIcon";
-
+import { registerKeyDown } from "../utils/keyDown.js";
+import { useEffect } from "react";
 export default function IpDatailsModal({ ip, onClose }) {
+  useEffect(() => {
+    const cleanup = registerKeyDown(onClose);
+    return cleanup;
+  }, [onClose]);
+
     return (
         <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
             <div className="modal-dialog modal-dialog-centered" role="document">
