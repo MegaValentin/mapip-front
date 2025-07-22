@@ -40,7 +40,7 @@ export default function IpsOfficeModal({ office, data, onClose, scanResults, sca
                             <>
                             <h6 className="mt-3">Ips asignadas: </h6>
                             <ul className="list-group">
-                                {data.map((ip, idx) => (
+                                {data.ips.map((ip, idx) => (
                                     <li key={idx} className="list-group-item">
                                         {ip.direccion} - {ip.estado}
                                     </li>
