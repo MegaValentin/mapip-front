@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import IconLogout from "./icons/LogoutIcon";
 
 export default function Dashboard() {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated) return null;
 
@@ -28,11 +28,13 @@ export default function Dashboard() {
               Gestion de Areas
             </Link>
         </li>
-        <li className="nav-items">
-          <Link to="/user-management" className="nav-link">
-              Gestion de Usuarios          
-          </Link>
-        </li>
+        {user?.role === "admin" && (
+          <li className="nav-item">
+            <Link to="/user-management" className="nav-link">
+              Gestion de Usuarios
+            </Link>
+          </li>
+        )}
         <li className="nav-item">
                   <button className="nav-link " onClick={logout}>
                     <IconLogout/>
