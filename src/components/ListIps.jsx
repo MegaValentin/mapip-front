@@ -33,6 +33,10 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const [scanResults, setScanResults] = useState(null)
   const [scanning, setScanning] = useState(false)
   const [feedback, setFeedback] = useState(null);
+  const [filters, setFilters] = useState({
+    estado: "",
+    equipo: ""
+  })
 
   const limit = 20;
 
@@ -41,8 +45,14 @@ export default function ListIps({ puertaEnlace, onClose, }) {
   const fetchIps = async () => {
     setLoading(true);
     try {
+      const params = {
+        puertaEnlace,
+        page,
+        limit,
+        ...filters
+      }
       const res = await axios.get(`${apiUrl}/api/ips/filtradas`, {
-        params: { puertaEnlace, page, limit },
+        params,
         withCredentials: true,
       });
 
@@ -134,7 +144,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     fetchFreeIps()
     fetchbusyIps(),
       fetchIpsWithConflicts()
-  }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
+  }, [puertaEnlace, page, filters]); // <-- se actualiza cuando cambia la página
 
   const handleDelete = async (ipId) => {
     const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar esta IP?");
@@ -279,6 +289,40 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               </li>
             </ul>
           </nav>
+          <div className="row mb-3 justify-content-center d-flex gap-2">
+
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={filters.estado}
+                onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
+              >
+                <option value="">Todos los estados</option>
+                <option value="libre">Libre</option>
+                <option value="ocupada">Ocupada</option>
+                <option value="conflicto">Conflicto</option>
+              </select>
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={filters.equipo}
+                onChange={(e) => setFilters({ ...filters, equipo: e.target.value })}
+              >
+                <option value="">Todos los equipos</option>
+                <option value="computadora">Computadora</option>
+                <option value="impresora">Impresora</option>
+                <option value="router">Router</option>
+                <option value="servidor">Servidor</option>
+              </select>
+            </div>
+            <button
+              className="btn btn-outline-secondary col-md-2"
+              onClick={() => setFilters({ estado: "", equipo: "" })}
+            >
+              Limpiar filtros
+            </button>
+          </div>
           <table className="table table-striped mt-4">
             <thead>
               <tr>
@@ -442,7 +486,46 @@ export default function ListIps({ puertaEnlace, onClose, }) {
 
         </>
       ) : (
-        <p>No hay IPs registradas para esta puerta de enlace.</p>
+        <>
+          <div className="row mb-3 justify-content-center d-flex gap-2">
+
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={filters.estado}
+                onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
+              >
+                <option value="">Todos los estados</option>
+                <option value="libre">Libre</option>
+                <option value="ocupada">Ocupada</option>
+                <option value="conflicto">Conflicto</option>
+              </select>
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={filters.equipo}
+                onChange={(e) => setFilters({ ...filters, equipo: e.target.value })}
+              >
+                <option value="">Todos los equipos</option>
+                <option value="computadora">Computadora</option>
+                <option value="impresora">Impresora</option>
+                <option value="router">Router</option>
+                <option value="servidor">Servidor</option>
+              </select>
+            </div>
+            <button
+              className="btn btn-outline-secondary col-md-2"
+              onClick={() => setFilters({ estado: "", equipo: "" })}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+
+          <div class="alert alert-info text-center my-4" role="alert">
+            <strong>¡Atención!</strong> No hay IPs registradas para esta puerta de enlace.
+          </div>
+        </>
       )}
     </div>
   );

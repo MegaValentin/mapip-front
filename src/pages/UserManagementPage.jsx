@@ -66,7 +66,7 @@ export default function UserManagementPage() {
 
 
     return (
-        <div className="container mt-4">
+        <div className="container mt-4 position-relative p-4  ">
 
             {loading ? (
                 <div className="text-center">
@@ -74,7 +74,7 @@ export default function UserManagementPage() {
                 </div>
             ) : users.length > 0 ? (
                 <>
-                    <table className="table table-stiped mt-4">
+                    <table className="table table-striped mt-4 shadow">
                         <thead>
                             <tr>
                                 <th>Usuario</th>
