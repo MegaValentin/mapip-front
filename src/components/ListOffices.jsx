@@ -5,6 +5,7 @@ import TrashIcon from "./icons/TrashIcon";
 import ScanIcon from "./icons/ScanIcon";
 import OfficeModal from "./OfficeModal";
 import IpsOfficeModal from "./IpsOfficeModal";
+import ConfirmModal from "./ConfirmModal"; // nuevo modal
 
 export default function ListOffices() {
     const [offices, setOffices] = useState([]);
@@ -14,10 +15,11 @@ export default function ListOffices() {
     const [selectedOffice, setSelectedOffice] = useState(null);
     const [selectedOfficeIps, setSelectedOfficeIps] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [scanning, setScanning] = useState(false)
-    const [scanResults, setScanResults] = useState(null)
-    const limit = 10;
+    const [scanning, setScanning] = useState(false);
+    const [scanResults, setScanResults] = useState(null);
+    const [confirmDeleteOfficeId, setConfirmDeleteOfficeId] = useState(null); // nuevo estado
 
+    const limit = 10;
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
     const fetchOffices = async () => {
@@ -36,18 +38,21 @@ export default function ListOffices() {
         }
     };
 
-    const handleDeleteOffice = async (officeId) => {
-        const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar esta área?");
-        if (!confirmDelete) return;
+    const handleAskDeleteOffice = (officeId) => {
+        setConfirmDeleteOfficeId(officeId);
+    };
 
+    const handleConfirmDeleteOffice = async () => {
         try {
-            await axios.delete(`${apiUrl}/api/office/${officeId}`, {
+            await axios.delete(`${apiUrl}/api/office/${confirmDeleteOfficeId}`, {
                 withCredentials: true,
             });
-            setOffices((prev) => prev.filter((office) => office._id !== officeId));
+            setOffices((prev) => prev.filter((office) => office._id !== confirmDeleteOfficeId));
         } catch (error) {
             console.error("Error al eliminar el área: ", error);
             alert("Ocurrió un error al intentar eliminar el área.");
+        } finally {
+            setConfirmDeleteOfficeId(null);
         }
     };
 
@@ -65,25 +70,24 @@ export default function ListOffices() {
     };
 
     const handleScanIps = async (office) => {
-        setScanning(true)
-        setSelectedOffice(office)
-        setScanResults(null)
-        setShowModal(true)
+        setScanning(true);
+        setSelectedOffice(office);
+        setScanResults(null);
+        setShowModal(true);
 
         try {
             const res = await axios.get(`${apiUrl}/api/scan/office/${office._id}`, {
                 withCredentials: true
-            })
+            });
 
-            setScanResults(res.data.results)
-
+            setScanResults(res.data.results);
         } catch (error) {
-            console.error("Error al escanear IPs: ", error)
-            alert("Error al escanear las Ips de la oficina")
+            console.error("Error al escanear IPs: ", error);
+            alert("Error al escanear las Ips de la oficina");
         } finally {
-            setScanning(false)
+            setScanning(false);
         }
-    }
+    };
 
     useEffect(() => {
         fetchOffices();
@@ -92,7 +96,9 @@ export default function ListOffices() {
     return (
         <>
 
-            <div className="modal-content position-relative p-4  rounded ">
+            <div className="modal-content position-relative p-4 bg-white rounded shadow">
+
+
                 {loading ? (
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status" />
@@ -121,11 +127,11 @@ export default function ListOffices() {
                                                 className="btn btn-sm btn-outline-secondary"
                                                 onClick={() => handleScanIps(office)}
                                             >
-                                                <ScanIcon/>
+                                                <ScanIcon />
                                             </button>
                                             <button
                                                 className="btn btn-sm btn-outline-danger"
-                                                onClick={() => handleDeleteOffice(office._id)}
+                                                onClick={() => handleAskDeleteOffice(office._id)}
                                             >
                                                 <TrashIcon />
                                             </button>
@@ -158,7 +164,6 @@ export default function ListOffices() {
                                 </li>
                             </ul>
                         </nav>
-
                     </>
                 ) : (
                     <p>No hay áreas registradas</p>
@@ -172,17 +177,25 @@ export default function ListOffices() {
                     onClose={() => setShowModal(false)}
                 />
             )}
-            
+
             {showModal && selectedOffice && (
-                <IpsOfficeModal 
-                office={selectedOffice}
-                data={selectedOfficeIps}
-                onClose={() => {
-                    setShowModal(false)
-                    setScanResults(null)
-                }}
-                scanResults={scanResults}
-                scanning={scanning}
+                <IpsOfficeModal
+                    office={selectedOffice}
+                    data={selectedOfficeIps}
+                    onClose={() => {
+                        setShowModal(false);
+                        setScanResults(null);
+                    }}
+                    scanResults={scanResults}
+                    scanning={scanning}
+                />
+            )}
+
+            {confirmDeleteOfficeId && (
+                <ConfirmModal
+                    message="¿Estás seguro de que querés eliminar esta área?"
+                    onConfirm={handleConfirmDeleteOffice}
+                    onCancel={() => setConfirmDeleteOfficeId(null)}
                 />
             )}
         </>
