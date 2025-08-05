@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import ConfirmModal from "./ConfirmModal"; // Importá tu modal de confirmación
+
 import IpDatailsModal from "./IpDatailModal";
 import IpEditModal from "./IpEditModal";
 import IpScanModal from "./IpScanModal";
@@ -19,20 +21,24 @@ import ScanIcon from "./icons/ScanIcon";
 
 import { CheckCircle, AlertTriangle, Cpu } from "lucide-react";
 
-export default function ListIps({ puertaEnlace, onClose, }) {
+export default function ListIps({ puertaEnlace, onClose }) {
   const [ips, setIps] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedIpData, setSelectedIpData] = useState(null);
-  const [modalLoading, setModalLoading] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false);
   const [ipToEdit, setIpToEdit] = useState(null);
-  const [ipsFree, setIpsFree] = useState([])
-  const [busyIps, setBuysIps] = useState([])
-  const [ipsWithConflicts, setIpsWithConflicts] = useState([])
-  const [scanResults, setScanResults] = useState(null)
-  const [scanning, setScanning] = useState(false)
+  const [ipsFree, setIpsFree] = useState([]);
+  const [busyIps, setBuysIps] = useState([]);
+  const [ipsWithConflicts, setIpsWithConflicts] = useState([]);
+  const [scanResults, setScanResults] = useState(null);
+  const [scanning, setScanning] = useState(false);
   const [feedback, setFeedback] = useState(null);
+
+  // Estado para el modal de confirmación
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [ipIdToDelete, setIpIdToDelete] = useState(null);
 
   const limit = 20;
 
@@ -47,10 +53,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
       });
 
       setIps(res.data.data);
-
-
       setTotalPages(res.data.totalPages);
-
     } catch (error) {
       console.error("Error al obtener las IPs", error);
     } finally {
@@ -65,13 +68,14 @@ export default function ListIps({ puertaEnlace, onClose, }) {
           puertaEnlace,
           estado: "libre",
         },
-        withCredentials: true
-      })
-      setIpsFree(res.data)
+        withCredentials: true,
+      });
+      setIpsFree(res.data);
     } catch (error) {
-      console.error("Error al obtener IPs libres", error)
+      console.error("Error al obtener IPs libres", error);
     }
-  }
+  };
+
   const fetchbusyIps = async () => {
     try {
       const res = await axios.get(`${apiUrl}/api/lengthips`, {
@@ -79,13 +83,14 @@ export default function ListIps({ puertaEnlace, onClose, }) {
           puertaEnlace,
           estado: "ocupada",
         },
-        withCredentials: true
-      })
-      setBuysIps(res.data)
+        withCredentials: true,
+      });
+      setBuysIps(res.data);
     } catch (error) {
-      console.error("Error al obtener IPs libres", error)
+      console.error("Error al obtener IPs ocupadas", error);
     }
-  }
+  };
+
   const fetchIpsWithConflicts = async () => {
     try {
       const res = await axios.get(`${apiUrl}/api/lengthips`, {
@@ -93,58 +98,54 @@ export default function ListIps({ puertaEnlace, onClose, }) {
           puertaEnlace,
           estado: "conflicto",
         },
-        withCredentials: true
-      })
-      setIpsWithConflicts(res.data)
+        withCredentials: true,
+      });
+      setIpsWithConflicts(res.data);
     } catch (error) {
-      console.error("Error al obtener IPs libres", error)
+      console.error("Error al obtener IPs con conflicto", error);
     }
-  }
+  };
 
   const compareMac = async (ipId) => {
     try {
       const res = await axios.get(`${apiUrl}/api/compare/${ipId}`, {
-        withCredentials: true
-      })
+        withCredentials: true,
+      });
 
-      const message = res.data?.mensaje
+      const message = res.data?.mensaje;
 
-      const itIsConflict = message.toLowerCase().includes("conflictiva")
-      const isBusy = message.toLowerCase().includes("MAC asignada automáticamente desde escaneo.")
-      const noHost = message.toLowerCase().includes("Host no activo")
+      const itIsConflict = message.toLowerCase().includes("conflictiva");
+      const isBusy = message.toLowerCase().includes(
+        "MAC asignada automáticamente desde escaneo."
+      );
+      const noHost = message.toLowerCase().includes("Host no activo");
 
       setFeedback({
         mensaje: message,
-        tipo: itIsConflict ? "conflicto" : isBusy ? "ocupada" : noHost ? "libre" : "info"
-      })
+        tipo: itIsConflict ? "conflicto" : isBusy ? "ocupada" : noHost ? "libre" : "info",
+      });
 
-      fetchIps()
-
+      fetchIps();
     } catch (error) {
       setFeedback({
         mensaje: "Error al escanear IP",
-        tipo: "error"
+        tipo: "error",
       });
     }
-  }
+  };
 
   useEffect(() => {
-
     fetchIps();
-    fetchFreeIps()
-    fetchbusyIps(),
-      fetchIpsWithConflicts()
-  }, [puertaEnlace, page, apiUrl]); // <-- se actualiza cuando cambia la página
+    fetchFreeIps();
+    fetchbusyIps();
+    fetchIpsWithConflicts();
+  }, [puertaEnlace, page, apiUrl]);
 
   const handleDelete = async (ipId) => {
-    const confirmDelete = window.confirm("¿Estás seguro de que querés eliminar esta IP?");
-    if (!confirmDelete) return;
-
     try {
       await axios.delete(`${apiUrl}/api/ips/${ipId}`, {
         withCredentials: true,
       });
-      // Actualizar lista después de eliminar
       setIps((prevIps) => prevIps.filter((ip) => ip._id !== ipId));
     } catch (error) {
       console.error("Error al eliminar la IP:", error);
@@ -152,9 +153,29 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   };
 
-  const handleViewIp = async (ipId) => {
-    setModalLoading(true)
+  // Cuando el usuario hace click en eliminar, abrimos el modal y guardamos el id
+  const handleRequestDelete = (ipId) => {
+    setIpIdToDelete(ipId);
+    setShowConfirmModal(true);
+  };
 
+  // Confirmar eliminar
+  const confirmDelete = () => {
+    if (ipIdToDelete) {
+      handleDelete(ipIdToDelete);
+    }
+    setShowConfirmModal(false);
+    setIpIdToDelete(null);
+  };
+
+  // Cancelar eliminar
+  const cancelDelete = () => {
+    setShowConfirmModal(false);
+    setIpIdToDelete(null);
+  };
+
+  const handleViewIp = async (ipId) => {
+    setModalLoading(true);
     try {
       const res = await axios.get(`${apiUrl}/api/ip/${ipId}`, {
         withCredentials: true,
@@ -166,29 +187,28 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     } finally {
       setModalLoading(false);
     }
-  }
+  };
 
   const handleScanIp = async (ipId) => {
-    setScanning(true)
+    setScanning(true);
     try {
       const res = await axios.get(`${apiUrl}/api/scan/ips/${ipId}`, {
-        withCredentials: true
-      })
-
-      setScanResults(res.data)
-      console.log(res.data)
+        withCredentials: true,
+      });
+      setScanResults(res.data);
+      console.log(res.data);
     } catch (error) {
-      console.error("Error al escanear la ip: ", error)
+      console.error("Error al escanear la ip: ", error);
       setScanResults({
         message: "Error al escanear",
-        direccion: "desconocidad",
+        direccion: "desconocida",
         activa: false,
-        resultado: error.message
-      })
+        resultado: error.message,
+      });
     } finally {
-      setScanning(false)
+      setScanning(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (feedback) {
@@ -199,10 +219,12 @@ export default function ListIps({ puertaEnlace, onClose, }) {
     }
   }, [feedback]);
 
-
   return (
     <div className="modal-content position-relative p-4 bg-white rounded shadow">
-      <button onClick={onClose} className="btn btn-sm btn-outline-danger position-absolute start-0 top-0 mx-4 mt-2">
+      <button
+        onClick={onClose}
+        className="btn btn-sm btn-outline-danger position-absolute start-0 top-0 mx-4 mt-2"
+      >
         <CloseIcon />
       </button>
 
@@ -213,14 +235,13 @@ export default function ListIps({ puertaEnlace, onClose, }) {
       ) : ips.length > 0 ? (
         <>
           <div className="row mt-4">
-
             {[
               {
                 title: "Ips Libre",
                 count: ipsFree.length,
                 border: "success",
                 text: "success",
-                icon: <CheckCircle className="text-success mb-2" size={24} />
+                icon: <CheckCircle className="text-success mb-2" size={24} />,
               },
               {
                 title: "Ips Ocupadas",
@@ -235,7 +256,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                 border: "warning",
                 text: "warning",
                 icon: <AlertTriangle className="text-warning mb-2" size={24} />,
-              }
+              },
             ].map((info, index) => (
               <div className="col-md-4" key={index}>
                 <div className={`card border-${info.border} shadow text-center`}>
@@ -248,8 +269,8 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                 </div>
               </div>
             ))}
-
           </div>
+
           <nav className="mt-3">
             <ul className="pagination justify-content-center">
               <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
@@ -279,6 +300,7 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               </li>
             </ul>
           </nav>
+
           <table className="table table-striped mt-4">
             <thead>
               <tr>
@@ -298,12 +320,13 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                   <td>{ip.direccion}</td>
                   <td>
                     <span
-                      className={`badge ${ip.estado === "ocupada"
-                        ? "bg-primary"
-                        : ip.estado === "libre"
+                      className={`badge ${
+                        ip.estado === "ocupada"
+                          ? "bg-primary"
+                          : ip.estado === "libre"
                           ? "bg-success"
                           : "bg-warning text-dark"
-                        }`}
+                      }`}
                     >
                       {ip.estado}
                     </span>
@@ -311,26 +334,35 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                   <td>{ip.hostname || "Sin hostname"}</td>
                   <td>{ip.mac || "MAC no asignada"}</td>
                   <td>{ip.area?.area || "Sin área"}</td>
-                  <td> {ip.equipo === "computadora" ? <CpuIcon />
-                    : ip.equipo === "impresora" ? <PrinterIcon />
-                      : ip.equipo === "router" ? <RouterIcon />
-                        : ip.equipo === "servidor" ? <ServerIcon />
-                          : <QuestionIcon />}</td>
+                  <td>
+                    {ip.equipo === "computadora" ? (
+                      <CpuIcon />
+                    ) : ip.equipo === "impresora" ? (
+                      <PrinterIcon />
+                    ) : ip.equipo === "router" ? (
+                      <RouterIcon />
+                    ) : ip.equipo === "servidor" ? (
+                      <ServerIcon />
+                    ) : (
+                      <QuestionIcon />
+                    )}
+                  </td>
 
                   <td>{new Date(ip.updatedAt).toLocaleString()}</td>
                   <td className="justify-content-end d-flex gap-2">
-
-                    <button className="btn btn-sm btn-outline-primary" onClick={() => handleViewIp(ip._id)}>
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => handleViewIp(ip._id)}
+                    >
                       <SeeIcon />
                     </button>
                     <button
                       className="btn btn-sm btn-outline-warning"
                       onClick={() => setIpToEdit(ip)}
                       onUpdated={() => {
-                        setIpToEdit(null)
-                        fetchIps()
-                      }
-                      }
+                        setIpToEdit(null);
+                        fetchIps();
+                      }}
                     >
                       <EditIcon />
                     </button>
@@ -346,12 +378,13 @@ export default function ListIps({ puertaEnlace, onClose, }) {
                     >
                       <ScanMacIcon />
                     </button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(ip._id)}>
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleRequestDelete(ip._id)} // <-- Cambié esta línea
+                    >
                       <TrashIcon />
                     </button>
-
                   </td>
-
                 </tr>
               ))}
             </tbody>
@@ -394,14 +427,15 @@ export default function ListIps({ puertaEnlace, onClose, }) {
 
           {feedback && (
             <div
-              className={`alert mt-3 ${feedback.tipo === "conflicto"
-                ? "alert-warning"
-                : feedback.tipo === "ocupada"
+              className={`alert mt-3 ${
+                feedback.tipo === "conflicto"
+                  ? "alert-warning"
+                  : feedback.tipo === "ocupada"
                   ? "alert-success"
                   : feedback.tipo === "error"
-                    ? "alert-danger"
-                    : "alert-secondary"
-                }`}
+                  ? "alert-danger"
+                  : "alert-secondary"
+              }`}
               role="alert"
             >
               {feedback.mensaje}
@@ -437,12 +471,17 @@ export default function ListIps({ puertaEnlace, onClose, }) {
               </li>
             </ul>
           </nav>
-
-
-
         </>
       ) : (
         <p>No hay IPs registradas para esta puerta de enlace.</p>
+      )}
+
+      {showConfirmModal && (
+        <ConfirmModal
+          message="¿Estás seguro de que querés eliminar esta IP?"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
       )}
     </div>
   );

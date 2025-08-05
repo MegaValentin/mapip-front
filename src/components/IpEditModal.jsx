@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import CloseIcon from "./icons/CloseIcon";
-import { useEffect } from "react";
-
+import { registerKeyDown } from "../utils/keyDown";
 
 export default function IpEditModal({ ip, onClose, onUpdated }) {
     const [formData, setFormData] = useState({
@@ -13,11 +12,16 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
         area: ip.area || "",
         observaciones: ip.observaciones || "",
         equipo: ip.equipo || ""
-    })
-    const [errors, setErrors] = useState([])
-    const [offices, setOffices] = useState([])
+    });
+    const [errors, setErrors] = useState([]);
+    const [offices, setOffices] = useState([]);
 
     const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
+
+    useEffect(() => {
+        const cleanup = registerKeyDown(onClose);
+        return cleanup;
+    }, [onClose]);
 
     const handleChange = (e) => {
         const { name, value } = e.target
