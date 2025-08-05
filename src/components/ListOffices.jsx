@@ -95,14 +95,17 @@ export default function ListOffices() {
 
     return (
         <>
+
             <div className="modal-content position-relative p-4 bg-white rounded shadow">
+
+
                 {loading ? (
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status" />
                     </div>
                 ) : offices.length > 0 ? (
                     <>
-                        <table className="table table-striped mt-4">
+                        <table className="table table-striped mt-4 shadow">
                             <thead>
                                 <tr>
                                     <th>Área</th>

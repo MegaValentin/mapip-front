@@ -1,7 +1,6 @@
-// components/IpListModal.jsx
 import CloseIcon from "./icons/CloseIcon";
 
-export default function IpListModal({ office, data, onClose }) {
+export default function OfficeModal({ office, data, onClose }) {
   return (
     <div className="modal fade show d-block" style={{ background: "rgba(0,0,0,0.5)" }}>
       <div className="modal-dialog modal-lg modal-dialog-centered">

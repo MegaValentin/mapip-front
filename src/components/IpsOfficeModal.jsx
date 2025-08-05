@@ -19,7 +19,9 @@ export default function IpsOfficeModal({ office, data, onClose, scanResults, sca
             <CloseIcon />
           </button>
 
+
           <h5 className="mb-3">Área: {office.area}</h5>
+
 
           {scanning ? (
             <div className="text-center my-4">
