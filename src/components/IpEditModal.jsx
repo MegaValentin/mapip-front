@@ -140,6 +140,7 @@ export default function IpEditModal({ ip, onClose, onUpdated }) {
                                 <option value="impresora">Impresora</option>
                                 <option value="router">Router</option>
                                 <option value="servidor" >Servidor</option>
+                                <option value="reloj">Reloj</option>
                             </select>
                         </div>
                         <div className="col-md-12">
