@@ -1,0 +1,94 @@
+/* Botón hamburguesa */
+.toggle-btn {
+  width: 40px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  z-index: 1101; /* encima del overlay */
+  position: relative;
+}
+
+.toggle-btn.click{
+  border: transparent;
+}
+
+.toggle-btn::before,
+.toggle-btn::after{
+  border: transparent;
+}
+
+/* Burger -> X */
+.burger {
+  position: relative;
+  width: 20px;
+  height: 2px;
+  background: #0d6efd;
+  display: inline-block;
+  transition: all 0.3s ease-in-out;
+}
+.burger::before,
+.burger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 2px;
+  background: #0d6efd;
+  transition: all 0.3s ease-in-out;
+}
+.burger::before {
+  top: -6px;
+  
+}
+.burger::after {
+  top: 6px;
+}
+
+.burger.open {
+  background: transparent;
+}
+.burger.open::before {
+  transform: rotate(45deg);
+  top: 0;
+  background: white;
+}
+.burger.open::after {
+  transform: rotate(-45deg);
+  top: 0;
+  background:white ;
+}
+
+/* Sidebar estilo offcanvas */
+.sidebar {
+  position: fixed;
+  left: -250px; /* oculto */
+  top: 0;
+  height: 100vh;
+  width: 250px;
+  background: #082c4c; /* azul oscuro */
+  color: white;
+  padding: 1rem;
+  transition: left 0.3s ease-in-out;
+  z-index: 1100;
+}
+.sidebar.open {
+  left: 0;
+  
+}
+.sidebar .nav-link {
+  color: #d1d5db; /* gris claro */
+  transition: color 0.2s;
+}
+.sidebar .nav-link:hover {
+  color: white;
+}
+
+/* Overlay al abrir */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1099;
+}

@@ -18,7 +18,8 @@ export default function RouterList() {
           withCredentials: true,
         });
         setRouters(res.data);
-      } catch (err) {
+      } catch (error) {
+        console.log("Error en el servidor" , error)
         setError("Error al cargar los routers");
       } finally {
         setLoading(false);

@@ -4,7 +4,7 @@ import UserManagementPage from "./pages/UserManagementPage.jsx";
 import OfficesPages from "./pages/OfficesPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
-import Dashboard from "./components/Dashboard.jsx";
+import Dashboard from "./components/Dashboard/Dashboard.jsx";
 import RouterPage from "./pages/RouterPage.jsx";
 
 import IpPage from "./pages/IpPage.jsx";
