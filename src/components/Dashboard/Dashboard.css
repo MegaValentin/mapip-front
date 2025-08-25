@@ -19,7 +19,7 @@
   border: transparent;
 }
 
-/* Burger -> X */
+
 .burger {
   position: relative;
   width: 20px;
@@ -91,4 +91,16 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1099;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    left: 0 !important;   
+    position: fixed;
+  }
+
+ 
+  .overlay {
+    display: none !important;
+  }
 }

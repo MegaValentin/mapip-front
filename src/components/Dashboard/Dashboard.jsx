@@ -45,7 +45,7 @@ export default function Dashboard() {
         <div className="overlay" onClick={() => setIsOpen(false)}></div>
       )}
 
-      <div className={`sidebar ${isOpen ? "open" : ""}`}>
+<div className={`sidebar ${isOpen ? "open" : ""} d-md-block`}>
         <Link to="/" onClick={() => setIsOpen(false)}>
           <img
             src="../../public/logoMapIp.png"
