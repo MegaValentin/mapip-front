@@ -1,43 +1,62 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+
 import RouterIcon from "./icons/RouterIcon";
 import EditIcon from "./icons/EditIcon";
 import TrashIcon from "./icons/TrashIcon";
+
+import RouterEditModal from "./RouterEditModal";
 
 export default function RouterList() {
   const [routers, setRouters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [routerEdit, setRouterEdit] = useState(null);
 
   const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
 
+  
+  const fetchRouters = useCallback(async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/api/ips-router`, {
+        withCredentials: true,
+      });
+      setRouters(res.data);
+      setError("");
+    } catch (error) {
+      console.log("Error en el servidor", error);
+      setError("Error al cargar los routers");
+    } finally {
+      setLoading(false);
+    }
+  }, [apiUrl]);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este router?")) return;
+
+    try {
+      await axios.delete(`${apiUrl}/api/routers/${id}`, {
+        withCredentials: true,
+      });
+
+      // Actualizar estado local (más rápido que volver a pedir todo)
+      setRouters((prev) => prev.filter((r) => r._id !== id));
+    } catch (error) {
+      console.error("Error al eliminar router", error);
+      alert("No se pudo eliminar el router.");
+    }
+  };
+
   useEffect(() => {
-    const fetchRouters = async () => {
-      try {
-        const res = await axios.get(`${apiUrl}/api/ips-router`, {
-          withCredentials: true,
-        });
-        setRouters(res.data);
-      } catch (error) {
-        console.log("Error en el servidor" , error)
-        setError("Error al cargar los routers");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRouters();
-  }, []);
+  }, [fetchRouters]);
 
   if (loading) return <p className="text-center mt-4">Cargando routers...</p>;
   if (error) return <p className="text-danger text-center mt-4">{error}</p>;
 
-
-
   const renderdata = (links) =>
     links.map((link, index) => (
-      <div
-        key={index}
-        className="col-6 mb-2">
+      <div key={index} className="col-6 mb-2">
         <strong>{link.text}</strong> <br />
         <span className="text-muted">{link.data || "—"}</span>
       </div>
@@ -49,9 +68,7 @@ export default function RouterList() {
         Lista de Routers <RouterIcon />
       </h2>
       {routers.length === 0 ? (
-        <p className="text-muted text-center">
-          No hay routers registrados.
-        </p>
+        <p className="text-muted text-center">No hay routers registrados.</p>
       ) : (
         <div className="row">
           {routers.map((router) => {
@@ -62,7 +79,7 @@ export default function RouterList() {
               { data: router.passAdmin, text: "PASS ADMIN" },
               { data: router.ssid, text: "SSID" },
               { data: router.passSsid, text: "PASS SSID" },
-              { data: router.area, text: "AREA" }
+              { data: router.area?.area, text: "AREA" },
             ];
 
             return (
@@ -85,10 +102,16 @@ export default function RouterList() {
                   </div>
 
                   <div className="card-footer text-center">
-                    <button className="btn btn-sm btn-outline-warning me-2">
+                    <button
+                      className="btn btn-sm btn-outline-warning me-2"
+                      onClick={() => setRouterEdit(router)}
+                    >
                       <EditIcon />
                     </button>
-                    <button className="btn btn-sm btn-outline-danger">
+                    <button
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleDelete(router._id)}
+                    >
                       <TrashIcon />
                     </button>
                   </div>
@@ -96,6 +119,16 @@ export default function RouterList() {
               </div>
             );
           })}
+          {routerEdit && (
+            <RouterEditModal
+              router={routerEdit}
+              onClose={() => setRouterEdit(null)}
+              onUpdated={() => {
+                setRouterEdit(null);
+                fetchRouters();
+              }}
+            />
+          )}
         </div>
       )}
     </div>
