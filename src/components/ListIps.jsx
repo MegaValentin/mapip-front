@@ -3,6 +3,10 @@ import axios from "axios";
 
 import ConfirmModal from "./ConfirmModal"; // Importá tu modal de confirmación
 
+import IpsFilters from "./IpFilters";
+import IpsSummary from "./IpSummary";
+import IpPagination from "./IpPagination";
+
 import IpDatailsModal from "./IpDatailModal";
 import IpEditModal from "./IpEditModal";
 import IpScanModal from "./IpScanModal";
@@ -20,22 +24,24 @@ import ClockIcon from "./icons/ClockIcon";
 import ScanMacIcon from "./icons/ScanMacIcon";
 import ScanIcon from "./icons/ScanIcon";
 
-import { CheckCircle, AlertTriangle, Cpu } from "lucide-react";
 
 export default function ListIps({ puertaEnlace, onClose }) {
   const [ips, setIps] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
   const [selectedIpData, setSelectedIpData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [ipToEdit, setIpToEdit] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  
   const [ipsFree, setIpsFree] = useState([]);
   const [busyIps, setBuysIps] = useState([]);
   const [ipsWithConflicts, setIpsWithConflicts] = useState([]);
+  
   const [scanResults, setScanResults] = useState(null);
-  const [scanning, setScanning] = useState(false);
-  const [feedback, setFeedback] = useState(null);
   const [filters, setFilters] = useState({
     estado: "",
     equipo: ""
@@ -72,48 +78,18 @@ export default function ListIps({ puertaEnlace, onClose }) {
     }
   };
 
-  const fetchFreeIps = async () => {
+  const fetchCounters = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: {
-          puertaEnlace,
-          estado: "libre",
-        },
-        withCredentials: true,
-      });
-      setIpsFree(res.data);
+      const [freeRes, busyRes, conflictRes] = await Promise.all([
+        axios.get(`${apiUrl}/api/lengthips`, { params: { puertaEnlace, estado: "libre" }, withCredentials: true }),
+        axios.get(`${apiUrl}/api/lengthips`, { params: { puertaEnlace, estado: "ocupada" }, withCredentials: true }),
+        axios.get(`${apiUrl}/api/lengthips`, { params: { puertaEnlace, estado: "conflicto" }, withCredentials: true }),
+      ]);
+      setIpsFree(freeRes.data);
+      setBuysIps(busyRes.data);
+      setIpsWithConflicts(conflictRes.data);
     } catch (error) {
-      console.error("Error al obtener IPs libres", error);
-    }
-  };
-
-  const fetchbusyIps = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: {
-          puertaEnlace,
-          estado: "ocupada",
-        },
-        withCredentials: true,
-      });
-      setBuysIps(res.data);
-    } catch (error) {
-      console.error("Error al obtener IPs ocupadas", error);
-    }
-  };
-
-  const fetchIpsWithConflicts = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}/api/lengthips`, {
-        params: {
-          puertaEnlace,
-          estado: "conflicto",
-        },
-        withCredentials: true,
-      });
-      setIpsWithConflicts(res.data);
-    } catch (error) {
-      console.error("Error al obtener IPs con conflicto", error);
+      console.error("Error en contadores de IPs", error);
     }
   };
 
@@ -147,9 +123,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
 
   useEffect(() => {
     fetchIps();
-    fetchFreeIps()
-    fetchbusyIps(),
-      fetchIpsWithConflicts()
+    fetchCounters()
   }, [puertaEnlace, page, filters]); // <-- se actualiza cuando cambia la página
 
 
@@ -246,107 +220,17 @@ export default function ListIps({ puertaEnlace, onClose }) {
         </div>
       ) : ips.length > 0 ? (
         <>
-          <div className="row mt-4">
-            {[
-              {
-                title: "Ips Libre",
-                count: ipsFree.length,
-                border: "success",
-                text: "success",
-                icon: <CheckCircle className="text-success mb-2" size={24} />,
-              },
-              {
-                title: "Ips Ocupadas",
-                count: busyIps.length,
-                border: "primary",
-                text: "primary",
-                icon: <Cpu className="text-primary mb-2" size={24} />,
-              },
-              {
-                title: "Ips con Conflicto",
-                count: ipsWithConflicts.length,
-                border: "warning",
-                text: "warning",
-                icon: <AlertTriangle className="text-warning mb-2" size={24} />,
-              },
-            ].map((info, index) => (
-              <div className="col-md-4" key={index}>
-                <div className={`card border-${info.border} shadow text-center`}>
-                  <div className="card-body">
-                    {info.icon}
-                    <h5 className={`card-title text-${info.text}`}>{info.title}</h5>
-                    <p className="card-text fs-4">{info.count}</p>
-                    <small className="text-muted">en {puertaEnlace}</small>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <IpsSummary free={ipsFree.length} 
+            busy={busyIps.length} 
+            conflict={ipsWithConflicts.length} 
+            puertaEnlace={puertaEnlace} />
 
-          <nav className="mt-3">
-            <ul className="pagination justify-content-center">
-              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                  aria-label="Anterior"
-                >
-                  <span aria-hidden="true">&laquo;</span>
-                </button>
-              </li>
-              <li className="page-item disabled">
-                <span className="page-link">
-                  Página {page} de {totalPages}
-                </span>
-              </li>
-              <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage(page + 1)}
-                  disabled={page === totalPages}
-                  aria-label="Siguiente"
-                >
-                  <span aria-hidden="true">&raquo;</span>
-                </button>
-              </li>
-            </ul>
-          </nav>
-          <div className="row mb-3 justify-content-center d-flex gap-2">
+        <IpPagination page={page} totalPages={totalPages} setPage={setPage} />
 
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filters.estado}
-                onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
-              >
-                <option value="">Todos los estados</option>
-                <option value="libre">Libre</option>
-                <option value="ocupada">Ocupada</option>
-                <option value="conflicto">Conflicto</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filters.equipo}
-                onChange={(e) => setFilters({ ...filters, equipo: e.target.value })}
-              >
-                <option value="">Todos los equipos</option>
-                <option value="computadora">Computadora</option>
-                <option value="impresora">Impresora</option>
-                <option value="router">Router</option>
-                <option value="servidor">Servidor</option>
-                <option value="reloj">Reloj</option>
-              </select>
-            </div>
-            <button
-              className="btn btn-outline-secondary col-md-2"
-              onClick={() => setFilters({ estado: "", equipo: "" })}
-            >
-              Limpiar filtros
-            </button>
-          </div>
+          
+
+          <IpsFilters filters={filters} setFilters={setFilters} />
+          
           <table className="table table-striped mt-4">
             <thead>
               <tr>
@@ -428,7 +312,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
                     </button>
                     <button
                       className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleRequestDelete(ip._id)} // <-- Cambié esta línea
+                      onClick={() => handleRequestDelete(ip._id)} 
                     >
                       <TrashIcon />
                     </button>
@@ -460,9 +344,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
               onUpdated={() => {
                 setIpToEdit(null);
                 fetchIps();
-                fetchFreeIps();
-                fetchbusyIps();
-                fetchIpsWithConflicts();
+                fetchCounters()
               }}
             />
           )}
@@ -490,73 +372,10 @@ export default function ListIps({ puertaEnlace, onClose }) {
             </div>
           )}
 
-          <nav className="mt-3">
-            <ul className="pagination justify-content-center">
-              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 1}
-                  aria-label="Anterior"
-                >
-                  <span aria-hidden="true">&laquo;</span>
-                </button>
-              </li>
-              <li className="page-item disabled">
-                <span className="page-link">
-                  Página {page} de {totalPages}
-                </span>
-              </li>
-              <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage(page + 1)}
-                  disabled={page === totalPages}
-                  aria-label="Siguiente"
-                >
-                  <span aria-hidden="true">&raquo;</span>
-                </button>
-              </li>
-            </ul>
-          </nav>
+          <IpPagination page={page} totalPages={totalPages} setPage={setPage} />
         </>
       ) : (
         <>
-          <div className="row mb-3 justify-content-center d-flex gap-2">
-
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filters.estado}
-                onChange={(e) => setFilters({ ...filters, estado: e.target.value })}
-              >
-                <option value="">Todos los estados</option>
-                <option value="libre">Libre</option>
-                <option value="ocupada">Ocupada</option>
-                <option value="conflicto">Conflicto</option>
-              </select>
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filters.equipo}
-                onChange={(e) => setFilters({ ...filters, equipo: e.target.value })}
-              >
-                <option value="">Todos los equipos</option>
-                <option value="computadora">Computadora</option>
-                <option value="impresora">Impresora</option>
-                <option value="router">Router</option>
-                <option value="servidor">Servidor</option>
-              </select>
-            </div>
-            <button
-              className="btn btn-outline-secondary col-md-2"
-              onClick={() => setFilters({ estado: "", equipo: "" })}
-            >
-              Limpiar filtros
-            </button>
-          </div>
-
           <div class="alert alert-info text-center my-4" role="alert">
             <strong>¡Atención!</strong> No hay IPs registradas para esta puerta de enlace.
           </div>
