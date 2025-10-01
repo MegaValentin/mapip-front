@@ -16,6 +16,7 @@ import PrinterIcon from "./icons/PrinterIcon";
 import CpuIcon from "./icons/CpuIcon";
 import ServerIcon from "./icons/ServerIcon";
 import QuestionIcon from "./icons/QuestionIcon";
+import ClockIcon from "./icons/ClockIcon";
 import ScanMacIcon from "./icons/ScanMacIcon";
 import ScanIcon from "./icons/ScanIcon";
 
@@ -336,6 +337,7 @@ export default function ListIps({ puertaEnlace, onClose }) {
                 <option value="impresora">Impresora</option>
                 <option value="router">Router</option>
                 <option value="servidor">Servidor</option>
+                <option value="reloj">Reloj</option>
               </select>
             </div>
             <button
@@ -387,6 +389,8 @@ export default function ListIps({ puertaEnlace, onClose }) {
                       <RouterIcon />
                     ) : ip.equipo === "servidor" ? (
                       <ServerIcon />
+                    ) : ip.equipo === "reloj" ? (
+                      <ClockIcon/>
                     ) : (
                       <QuestionIcon />
                     )}

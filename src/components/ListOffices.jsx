@@ -170,7 +170,7 @@ export default function ListOffices() {
                 )}
             </div>
 
-            {showModal && selectedOffice && selectedOfficeIps && (
+            {showModal && selectedOffice && selectedOfficeIps && !scanResults && (
                 <OfficeModal
                     office={selectedOffice}
                     data={selectedOfficeIps}
@@ -178,15 +178,14 @@ export default function ListOffices() {
                 />
             )}
 
-            {showModal && selectedOffice && (
+            {showModal && selectedOffice && scanResults && (
                 <IpsOfficeModal
                     office={selectedOffice}
-                    data={selectedOfficeIps}
+                    data={scanResults}
                     onClose={() => {
                         setShowModal(false);
                         setScanResults(null);
                     }}
-                    scanResults={scanResults}
                     scanning={scanning}
                 />
             )}
